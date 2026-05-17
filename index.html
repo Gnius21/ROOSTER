@@ -1,564 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="nl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROOSTER 2026–2028</title>
+<title>ROOSTER 2026 - May & April</title>
 
 <style>
 :root {
   --bg1: #0f172a;
   --bg2: #020617;
   --card: #0f172a;
-  --stroke: #1e293b;
-  --stroke2: #334155;
-  --text: #f8fafc;
-  --muted: #cbd5e1;
   --accent: #60a5fa;
-  --accent2: #2563eb;
-  --shadow: 0 10px 30px rgba(0,0,0,.35);
-  --radius: 20px;
 }
-
-* { box-sizing: border-box; }
-
 body {
   background: radial-gradient(circle at top, var(--bg1), var(--bg2));
-  color: var(--text);
+  color: #f8fafc;
   font-family: Arial, sans-serif;
-  padding: 16px;
   margin: 0;
+  padding: 15px;
 }
-
-.container { max-width: 1200px; margin: auto; }
-
+.container { max-width: 1300px; margin: auto; }
 .card {
   background: var(--card);
-  border: 1px solid var(--stroke);
-  border-radius: var(--radius);
+  border: 1px solid #1e293b;
+  border-radius: 20px;
   padding: 20px;
   margin-bottom: 20px;
-  box-shadow: var(--shadow);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
 }
-
-.title {
-  text-align: center;
-  font-size: 32px;
-  font-weight: 900;
-  color: var(--accent);
-  margin-bottom: 16px;
-}
-
-/* Tabs + year dropdown */
+.title { text-align: center; font-size: 38px; font-weight: 900; color: var(--accent); margin: 0 0 20px; }
 .tabs {
   display: flex;
-  align-items: center;
-  background: rgba(15,23,42,0.8);
-  padding: 8px 10px;
-  border-radius: 9999px;
-  margin-bottom: 16px;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
 }
-
-.tabs-scroll {
-  position: relative;
-  display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  flex: 1;
-}
-.tabs-scroll::-webkit-scrollbar { display: none; }
-
-/* fade edges */
-.tabs-scroll::before,
-.tabs-scroll::after {
-  content: "";
-  position: sticky;
-  top: 0;
-  width: 18px;
-  pointer-events: none;
-  z-index: 2;
-}
-.tabs-scroll::before {
-  left: 0;
-  background: linear-gradient(to right, rgba(15,23,42,1), rgba(15,23,42,0));
-}
-.tabs-scroll::after {
-  right: 0;
-  background: linear-gradient(to left, rgba(15,23,42,1), rgba(15,23,42,0));
-}
-
 .tab-btn {
-  padding: 8px 14px;
-  background: transparent;
+  padding: 12px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  background: #111827;
   border: none;
-  color: var(--muted);
-  font-weight: 600;
   border-radius: 9999px;
+  color: #cbd5e1;
   cursor: pointer;
-  font-size: 13px;
-  white-space: nowrap;
 }
-.tab-btn.active { background: var(--accent2); color: white; }
-
-.year-select {
-  margin-left: 8px;
-  background: #1e293b;
+.tab-btn.active {
+  background: #2563eb;
   color: white;
-  border: 1px solid var(--stroke2);
-  padding: 6px 10px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 13px;
 }
 
-/* Content */
-.tab-content { display: none; }
-.tab-content.active { display: block; }
-
-/* Upload area */
 .upload-area {
-  border: 2px dashed var(--stroke2);
+  border: 2px dashed #334155;
   border-radius: 16px;
-  padding: 30px;
+  padding: 25px;
   text-align: center;
   cursor: pointer;
-  margin-bottom: 16px;
+  margin: 15px 0;
 }
-.upload-area:hover { border-color: var(--accent); }
-.upload-area p { margin: 0; color: var(--muted); }
+.upload-area:hover { border-color: #60a5fa; }
 
-img.rooster-img {
-  width: 100%;
-  display: none;
-  border-radius: 12px;
-}
-
-/* Vakantie canvas */
-.vac-canvas {
-  width: 100%;
-  border: 3px solid var(--accent);
-  border-radius: 12px;
-  background: black;
-}
-
-/* Rooster Pro styles */
-.search{
-  width:100%;
-  padding:10px;
-  border-radius:10px;
-  background:#111827;
-  border:1px solid #334155;
-  color:white;
-  margin:10px 0;
-  font-size:13px;
-}
-
-table{ width:100%; border-collapse:collapse; font-size:12px; }
-th{ background:#111827; padding:8px; color:#cbd5e1; }
-td{ padding:8px; text-align:center; border-bottom:1px solid #1e293b; }
-td[contenteditable=true]:focus{ background:#1d4ed8; outline:none; }
-
-.kw{ background:rgba(250,204,21,0.15); color:#fde047; font-weight:bold; }
-.d{ background:rgba(34,197,94,0.15); color:#86efac; font-weight:bold; }
-.x{ background:rgba(239,68,68,0.15); color:#fca5a5; font-weight:bold; }
-
-.box{
-  background:#111827;
-  padding:10px;
-  border-radius:10px;
-  margin-top:8px;
-  text-align:center;
-}
-
-.value{
-  font-size:18px;
-  font-weight:bold;
-  color:#60a5fa;
-}
-
-button{
-  padding:8px 12px;
-  border:none;
-  border-radius:10px;
-  font-weight:bold;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.blue{ background:#2563eb; color:white; }
-.green{ background:#059669; color:white; }
-
-@media (max-width: 600px){
-  .title { font-size: 26px; }
-  .card { padding: 14px; }
-}
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { background: #111827; padding: 12px 8px; }
+td { padding: 10px 8px; text-align: center; border-bottom: 1px solid #1e293b; }
+td[contenteditable=true] { background: rgba(37,99,235,0.25); cursor: text; }
+.kw { background: rgba(250,204,21,0.25)!important; color: #fde047!important; font-weight: bold; }
+.d  { background: rgba(34,197,94,0.25)!important; color: #86efac!important; font-weight: bold; }
+.x  { background: rgba(239,68,68,0.25)!important; color: #fca5a5!important; font-weight: bold; }
 </style>
 </head>
-
 <body>
 <div class="container">
-  <h1 class="title">ROOSTER 2026–2028</h1>
-
+  <h1 class="title">ROOSTER 2026</h1>
+  
   <div class="tabs">
-    <div class="tabs-scroll" id="monthButtons"></div>
-    <select id="yearSelect" class="year-select">
-      <option value="2026" selected>2026</option>
-      <option value="2027">2027</option>
-      <option value="2028">2028</option>
-    </select>
+    <button class="tab-btn active" onclick="switchTab(0)">Mei 2026</button>
+    <button class="tab-btn" onclick="switchTab(1)">April 2026</button>
   </div>
 
-  <div class="card">
-    <div id="content-area"></div>
-  </div>
+  <div class="card" id="content"></div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
-const months = [
-  "January","February","March","April","May","June",
-  "July","August","September","October","November","December",
-  "Vakantie"
+// ================== DATA ==================
+let dataMei = JSON.parse(localStorage.getItem("meiData")) || [
+  ["1","VR","KW","4","X","","DAG VAN ARBEID"],["2","ZA","D","12","X","",""],["3","ZO","X","","D","12",""],
+  ["4","MA","D","12","A","12",""],["5","DI","KW","4","A","12",""],["6","WO","KW","4","X","",""],
+  ["7","DO","KW","4","R","",""],["8","VR","D","12","R","",""],["9","ZA","X","","X","",""],
+  ["10","ZO","X-D","","D-X","12",""],["11","MA","D-X","12","X-D","",""],["12","DI","KW","4","A","12",""],
+  ["13","WO","KW","4","A","12",""],["14","DO","KW","4","X","","HEMELVAART"],["15","VR","KW","4","R","",""],
+  ["16","ZA","X","","R","",""],["17","ZO","X","","X","",""],["18","MA","KW","4","D*","8",""],
+  ["19","DI","KW","4","D*","8",""],["20","WO","D","12","A","12",""],["21","DO","KW","4","A","12",""],
+  ["22","VR","KW","4","X","",""],["23","ZA","D=X","12","R","","VG"],["24","ZO","X","","R","",""],
+  ["25","MA","KW","4","X","",""],["26","DI","D","12","X","",""],["27","WO","KW","4","D*","8",""],
+  ["28","DO","KW","4","A","12",""],["29","VR","KW","4","A","12",""],["30","ZA","X","","X","",""],
+  ["31","ZO","X","","R","",""]
 ];
 
-let currentYear = 2026;
-let currentMonthKey = "may";
-
-/* ---------- INIT ---------- */
-window.onload = () => {
-  const yearSelect = document.getElementById("yearSelect");
-  yearSelect.onchange = e => {
-    currentYear = parseInt(e.target.value,10);
-    buildYearUI(currentYear);
-  };
-  buildYearUI(2026); // start on 2026, May
-};
-
-/* ---------- BUILD YEAR UI ---------- */
-function buildYearUI(year){
-  currentYear = year;
-  const monthButtons = document.getElementById("monthButtons");
-  const contentArea = document.getElementById("content-area");
-
-  monthButtons.innerHTML = "";
-  contentArea.innerHTML = "";
-
-  months.forEach(month => {
-    const key = month.toLowerCase().replace(" ","");
-    const btn = document.createElement("button");
-    btn.className = "tab-btn";
-    btn.textContent = (month === "Vakantie") ? "Vakantie" : month.slice(0,3);
-    btn.dataset.key = key;
-    btn.onclick = () => activateMonth(key);
-    monthButtons.appendChild(btn);
-
-    const div = document.createElement("div");
-    div.id = `content-${year}-${key}`;
-    div.className = "tab-content";
-
-    if(month === "Vakantie"){
-      div.innerHTML = `
-        <h2 style="text-align:center;color:var(--accent);">Vakantie Planning ${year}</h2>
-        <div class="upload-area" id="upload-vak-${year}">
-          <input type="file" id="input-vak-${year}" hidden accept="image/*">
-          <p>📸 Upload Vakantie Planning Foto</p>
-        </div>
-        <canvas id="vacCanvas-${year}" class="vac-canvas"></canvas>
-        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap;">
-          <button class="blue" onclick="addText(${year})">Add Text</button>
-          <button class="green" onclick="saveCanvas(${year})">Save</button>
-        </div>
-      `;
-    } else if(year === 2026 && month === "May"){
-      div.innerHTML = `
-        <h2 style="text-align:center;color:var(--accent);">May 2026</h2>
-        <div class="upload-area" id="upload-${year}-may">
-          <input type="file" id="input-${year}-may" hidden accept="image/*">
-          <p>📸 Upload rooster foto</p>
-        </div>
-        <img id="img-${year}-may" class="rooster-img">
-
-        <div class="card" style="margin-top:20px;">
-          <div class="title" style="font-size:22px;margin-bottom:10px;">Rooster 2026 Pro – May</div>
-          <input class="search" id="search-2026-may" oninput="searchTable()" placeholder="Zoek...">
-          <table id="table-2026-may"></table>
-        </div>
-
-        <div class="card">
-          <div class="box">GMA: <div class="value" id="gma">0</div></div>
-          <div class="box">JPA: <div class="value" id="jpa">0</div></div>
-          <div class="box">SALARY: <div class="value" id="salary">0 XCG</div></div>
-          <div class="box">OVERTIME GMA: <div class="value" id="gmaot">0</div></div>
-          <div class="box">OVERTIME JPA: <div class="value" id="jpaot">0</div></div>
-        </div>
-
-        <div class="card">
-          <button class="blue" onclick="exportExcel()">EXPORT EXCEL</button>
-          <button class="green" onclick="window.print()">PRINT</button>
-        </div>
-      `;
-    } else {
-      div.innerHTML = `
-        <h2 style="text-align:center;color:var(--accent);">${month} ${year}</h2>
-        <div class="upload-area" id="upload-${year}-${key}">
-          <input type="file" id="input-${year}-${key}" hidden accept="image/*">
-          <p>📸 Upload rooster foto</p>
-        </div>
-        <img id="img-${year}-${key}" class="rooster-img">
-      `;
-    }
-
-    contentArea.appendChild(div);
-  });
-
-  setupUploadsForYear(year);
-  initVakantieCanvas(year);
-  if(year === 2026) initRoosterPro();
-
-  // always start on May
-  activateMonth("may");
-}
-
-/* ---------- ACTIVATE MONTH TAB ---------- */
-function activateMonth(key){
-  currentMonthKey = key;
-  document.querySelectorAll(".tab-btn").forEach(btn=>{
-    btn.classList.toggle("active", btn.dataset.key === key);
-  });
-  document.querySelectorAll(".tab-content").forEach(div=>{
-    div.classList.remove("active");
-  });
-  const div = document.getElementById(`content-${currentYear}-${key}`);
-  if(div) div.classList.add("active");
-}
-
-/* ---------- UPLOADS PER YEAR ---------- */
-function setupUploadsForYear(year){
-  months.forEach(month=>{
-    const key = month.toLowerCase().replace(" ","");
-    if(month === "Vakantie") return;
-
-    const uploadId = (year===2026 && month==="May")
-      ? `upload-${year}-may`
-      : `upload-${year}-${key}`;
-    const inputId = (year===2026 && month==="May")
-      ? `input-${year}-may`
-      : `input-${year}-${key}`;
-    const imgId = (year===2026 && month==="May")
-      ? `img-${year}-may`
-      : `img-${year}-${key}`;
-
-    const upload = document.getElementById(uploadId);
-    const input = document.getElementById(inputId);
-    const img = document.getElementById(imgId);
-
-    if(!upload || !input || !img) return;
-
-    upload.onclick = () => input.click();
-    input.onchange = e => {
-      const file = e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = ev => {
-        img.src = ev.target.result;
-        img.style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    };
-  });
-}
-
-/* ---------- VAKANTIE CANVAS PER YEAR ---------- */
-function initVakantieCanvas(year){
-  const canvas = document.getElementById(`vacCanvas-${year}`);
-  if(!canvas) return;
-  const ctx = canvas.getContext("2d");
-  const upload = document.getElementById(`upload-vak-${year}`);
-  const input = document.getElementById(`input-vak-${year}`);
-
-  upload.onclick = () => input.click();
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const img = new Image();
-      img.onload = () => {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx.drawImage(img,0,0);
-      };
-      img.src = ev.target.result;
-    };
-    reader.readAsDataURL(file);
-  };
-}
-
-function addText(year){
-  const canvas = document.getElementById(`vacCanvas-${year}`);
-  if(!canvas) return;
-  const ctx = canvas.getContext("2d");
-  const text = prompt("Enter text:");
-  if(!text) return;
-  ctx.font = "40px Arial";
-  ctx.fillStyle = "#60a5fa";
-  ctx.fillText(text, 50, 100);
-}
-
-function saveCanvas(year){
-  const canvas = document.getElementById(`vacCanvas-${year}`);
-  if(!canvas) return;
-  const link = document.createElement("a");
-  link.download = `vakantie_planning_${year}.png`;
-  link.href = canvas.toDataURL();
-  link.click();
-}
-
-/* ---------- ROOSTER PRO (MAY 2026) ---------- */
-let data = [
-["1","VR","KW","4","X","","DAG VAN ARBEID"],
-["2","ZA","D","12","X","",""],
-["3","ZO","X","","D","12",""],
-["4","MA","D","12","A","12",""],
-["5","DI","KW","4","A","12",""],
-["6","WO","KW","4","X","",""],
-["7","DO","KW","4","R","",""],
-["8","VR","D","12","R","",""],
-["9","ZA","X","","X","",""],
-["10","ZO","X-D","","D-X","12",""],
-["11","MA","D-X","12","X-D","",""],
-["12","DI","KW","4","A","12",""],
-["13","WO","KW","4","A","12",""],
-["14","DO","KW","4","X","","HEMELVAART"],
-["15","VR","KW","4","R","",""],
-["16","ZA","X","","R","",""],
-["17","ZO","X","","X","",""],
-["18","MA","KW","4","D*","8",""],
-["19","DI","KW","4","D*","8",""],
-["20","WO","D","12","A","12",""],
-["21","DO","KW","4","A","12",""],
-["22","VR","KW","4","X","",""],
-["23","ZA","D=X","12","R","","VG"],
-["24","ZO","X","","R","",""],
-["25","MA","KW","4","X","",""],
-["26","DI","D","12","X","",""],
-["27","WO","KW","4","D*","8",""],
-["28","DO","KW","4","A","12",""],
-["29","VR","KW","4","A","12",""],
-["30","ZA","X","","X","",""],
-["31","ZO","X","","R","",""]
+let dataApril = JSON.parse(localStorage.getItem("aprilData")) || [
+  ["1","WO","X","4","KW","4",""],["2","DO","D*","8","KW","4","Goede Vrijdag"],
+  ["3","VR","D*","8","KW","4",""],["4","ZA","A","12","X","0",""],
+  ["5","ZO","A","12","X","0","Pasen"],["6","MA","X","4","KW","4","2de Paasdag"],
+  ["7","DI","R=D*","8","KW","4",""],["8","WO","R=D*","8","KW","4",""],
+  ["9","DO","X","4","KW","4",""],["10","VR","VAK","0","A","12",""],
+  ["11","ZA","VAK","0","A","12",""],["12","ZO","VAK","0","X","0",""],
+  ["13","MA","VAK","0","R=A","12",""],["14","DI","VAK","0","R","0",""],
+  ["15","WO","X","4","KW","4",""],["16","DO","X","4","KW","4",""],
+  ["17","VR","VAK","0","D*","8",""],["18","ZA","VAK","0","A","12",""],
+  ["19","ZO","VAK","0","A","12",""],["20","MA","VAK","0","X","0",""],
+  ["21","DI","VAK","0","R=A","12",""],["22","WO","X","4","KW","4",""],
+  ["23","DO","X","4","KW","4",""],["24","VR","R","0","D","12",""],
+  ["25","ZA","X","0","D","12",""],["26","ZO","D","12","A","12",""],
+  ["27","MA","X","4","D","12","Koningsdag"],["28","DI","A","12","X","0",""],
+  ["29","WO","A","12","KW","4",""],["30","DO","X","4","KW","4",""]
 ];
 
-function getHours(v){
-  v = (v || "").toUpperCase();
-  if(v.includes("D*")) return 8;
-  if(v === "D") return 12;
-  if(v === "A") return 12;
-  if(v.includes("KW")) return 4;
+function getHours(v) {
+  v = (v || "").toString().toUpperCase();
+  if (v.includes("D*")) return 8;
+  if (v.includes("D")) return 12;
+  if (v === "A") return 12;
+  if (v.includes("KW")) return 4;
   return 0;
 }
 
-function initRoosterPro(){
-  const table = document.getElementById("table-2026-may");
-  if(!table) return;
-  renderRooster();
+// ================== SWITCH TABS ==================
+function switchTab(n) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === n);
+  });
+  if (n === 0) loadMonth("Mei", dataMei);
+  else loadMonth("April", dataApril);
 }
 
-function renderRooster(){
-  const table = document.getElementById("table-2026-may");
-  if(!table) return;
-
+function loadMonth(name, data) {
   let html = `
-    <thead>
-      <tr>
-        <th>DATUM</th><th>DAG</th><th>GMA</th><th>U</th>
-        <th>JPA</th><th>U</th><th>OPMERKING</th>
-      </tr>
-    </thead><tbody>
+    <h2 style="text-align:center; color:#60a5fa;">${name} 2026</h2>
+    
+    <div class="upload-area" onclick="document.getElementById('upload-${name}').click()">
+      📸 Upload rooster foto (auto saved)<br>
+      <input type="file" id="upload-${name}" accept="image/*" style="display:none" onchange="uploadImage('${name}', event)">
+    </div>
+    <img id="img-${name}" style="width:100%; border-radius:12px; margin:10px 0; display:${localStorage.getItem('img_'+name)?'block':'none'}" 
+         src="${localStorage.getItem('img_'+name)||''}">
+
+    <table id="proTable">
+      <thead>
+        <tr>
+          <th>DATUM</th><th>DAG</th><th>GMA</th><th>U</th><th>JPA</th><th>U</th><th>OPMERKING</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div style="margin-top:15px; text-align:center;">
+      <button onclick="exportCurrent('${name}')" style="padding:10px 20px; background:#2563eb; color:white; border:none; border-radius:8px;">Export Excel</button>
+    </div>
   `;
 
-  data.forEach((r,i)=>{
-    html += "<tr>";
-    r.forEach((c,j)=>{
-      let cls = "";
-      if(j===2){
-        if(c.includes("KW")) cls="kw";
-        if(c.includes("D")) cls="d";
-        if(c.includes("X")) cls="x";
+  document.getElementById("content").innerHTML = html;
+  renderProTable(name, data);
+}
+
+function renderProTable(monthName, data) {
+  const tbody = document.querySelector("#proTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach((row, i) => {
+    const tr = document.createElement("tr");
+    row.forEach((cell, j) => {
+      const td = document.createElement("td");
+      td.contentEditable = true;
+      td.textContent = cell || "";
+      
+      if (j === 2 || j === 4) {
+        let v = (cell+"").toUpperCase();
+        if (v.includes("KW")) td.classList.add("kw");
+        else if (v.includes("D")) td.classList.add("d");
+        else if (v.includes("X")) td.classList.add("x");
       }
-      if(j===4){
-        if(c.includes("KW")) cls="kw";
-        if(c.includes("D")) cls="d";
-        if(c.includes("X")) cls="x";
-      }
-      html += `<td class="${cls}" contenteditable="true" oninput="editCell(this,${i},${j})">${c}</td>`;
+      
+      td.onblur = () => {
+        data[i][j] = td.textContent.trim();
+        if (j === 2) data[i][3] = getHours(data[i][2]);
+        if (j === 4) data[i][5] = getHours(data[i][4]);
+        
+        if (monthName === "Mei") localStorage.setItem("meiData", JSON.stringify(dataMei));
+        else localStorage.setItem("aprilData", JSON.stringify(dataApril));
+      };
+      tr.appendChild(td);
     });
-    html += "</tr>";
-  });
-
-  html += "</tbody>";
-  table.innerHTML = html;
-  calcTotals();
-}
-
-function editCell(el,r,c){
-  data[r][c] = el.textContent.trim();
-  if(c===2){
-    data[r][3] = getHours(data[r][2]);
-    renderRooster();
-    return;
-  }
-  if(c===4){
-    data[r][5] = getHours(data[r][4]);
-    renderRooster();
-    return;
-  }
-  calcTotals();
-}
-
-function calcTotals(){
-  let gma=0, jpa=0;
-  data.forEach(r=>{
-    gma += parseFloat(r[3])||0;
-    jpa += parseFloat(r[5])||0;
-  });
-
-  let gmaot = Math.max(0, gma-144);
-  let jpaot = Math.max(0, jpa-144);
-  let salary = (gma+jpa)*25 + (gmaot+jpaot)*25;
-
-  if(document.getElementById("gma")){
-    document.getElementById("gma").innerText = gma;
-    document.getElementById("jpa").innerText = jpa;
-    document.getElementById("gmaot").innerText = gmaot;
-    document.getElementById("jpaot").innerText = jpaot;
-    document.getElementById("salary").innerText = salary.toFixed(2)+" XCG";
-  }
-}
-
-function searchTable(){
-  const input = document.getElementById("search-2026-may");
-  if(!input) return;
-  const v = input.value.toLowerCase();
-  const rows = document.querySelectorAll("#table-2026-may tbody tr");
-  rows.forEach(r=>{
-    r.style.display = r.innerText.toLowerCase().includes(v) ? "" : "none";
+    tbody.appendChild(tr);
   });
 }
 
-function exportExcel(){
-  const ws = XLSX.utils.aoa_to_sheet([
-    ["DATUM","DAG","GMA","U","JPA","U","OPMERKING"],
-    ...data
-  ]);
+function uploadImage(month, e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    localStorage.setItem('img_' + month, ev.target.result);
+    loadMonth(month, month === "Mei" ? dataMei : dataApril);
+  };
+  reader.readAsDataURL(file);
+}
+
+function exportCurrent(month) {
+  const data = month === "Mei" ? dataMei : dataApril;
+  const ws = XLSX.utils.aoa_to_sheet([["DATUM","DAG","GMA","U","JPA","U","OPMERKING"], ...data]);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,"Rooster May 2026");
-  XLSX.writeFile(wb,"rooster_may_2026.xlsx");
+  XLSX.utils.book_append_sheet(wb, ws, month);
+  XLSX.writeFile(wb, `Rooster_${month}_2026.xlsx`);
 }
+
+// Start with Mei
+switchTab(0);
 </script>
 </body>
 </html>
