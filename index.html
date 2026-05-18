@@ -3,762 +3,802 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROOSTER 2026 - Professional Schedule Manager</title>
+<title>ROOSTER 2026 - Full Schedule Manager</title>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
 
-:root {
-  --bg1: #0a0e27;
-  --bg2: #050810;
-  --card: #0f1629;
-  --accent: #3b82f6;
-  --accent-light: #60a5fa;
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --border: #1e293b;
+:root{
+  --bg:#0b1020;
+  --card:#131c31;
+  --border:#23304d;
+  --accent:#3b82f6;
+  --accent2:#60a5fa;
+  --text:#f1f5f9;
+  --muted:#94a3b8;
+  --green:#22c55e;
+  --orange:#fb923c;
+  --red:#ef4444;
+  --purple:#a855f7;
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 100%);
-  color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
-  padding: 20px;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
+body{
+  background:linear-gradient(135deg,#050816,#0f172a);
+  color:var(--text);
+  font-family:'Outfit',sans-serif;
+  min-height:100vh;
+  padding:24px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 40px;
-  animation: fadeIn 0.6s ease;
+.container{
+  max-width:1500px;
+  margin:auto;
 }
 
-.header h1 {
-  font-size: 56px;
-  font-weight: 900;
-  background: linear-gradient(135deg, var(--accent-light), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
-  letter-spacing: -1px;
+.header{
+  text-align:center;
+  margin-bottom:30px;
 }
 
-.header p {
-  color: var(--text-secondary);
-  font-size: 16px;
-  font-weight: 500;
+.header h1{
+  font-size:56px;
+  font-weight:900;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
 }
 
-.tabs-container {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 30px;
-  padding: 20px;
-  background: rgba(15, 22, 41, 0.5);
-  border-radius: 16px;
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--border);
-  animation: slideDown 0.6s ease;
+.header p{
+  color:var(--muted);
+  margin-top:8px;
 }
 
-.tab-btn {
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: 'Outfit', sans-serif;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:25px;
+  justify-content:center;
 }
 
-.tab-btn:hover {
-  border-color: var(--accent);
-  color: var(--accent-light);
-  transform: translateY(-2px);
+.tab-btn{
+  padding:12px 22px;
+  border:none;
+  border-radius:10px;
+  background:#172036;
+  color:var(--text);
+  cursor:pointer;
+  transition:.25s;
+  font-weight:700;
 }
 
-.tab-btn.active {
-  background: var(--accent);
-  color: white;
-  border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(60, 130, 246, 0.3);
+.tab-btn:hover{
+  transform:translateY(-2px);
 }
 
-.content-card {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 30px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-  animation: fadeIn 0.5s ease;
+.tab-btn.active{
+  background:var(--accent);
 }
 
-.month-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--accent-light);
-  margin-bottom: 25px;
-  text-align: center;
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:24px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
 }
 
-.upload-section {
-  margin-bottom: 30px;
+.month-title{
+  font-size:34px;
+  margin-bottom:24px;
+  color:var(--accent2);
+  text-align:center;
 }
 
-.upload-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.upload-box{
+  border:2px dashed var(--accent);
+  border-radius:14px;
+  padding:34px;
+  text-align:center;
+  margin-bottom:25px;
+  background:rgba(59,130,246,.05);
+  cursor:pointer;
+  transition:.25s;
 }
 
-.upload-area {
-  border: 2px dashed var(--accent);
-  border-radius: 12px;
-  padding: 40px 20px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(60, 130, 246, 0.05);
+.upload-box:hover{
+  background:rgba(59,130,246,.12);
 }
 
-.upload-area:hover {
-  background: rgba(60, 130, 246, 0.1);
-  border-color: var(--accent-light);
-  transform: scale(1.01);
+.upload-box.dragging{
+  background:rgba(96,165,250,.16);
 }
 
-.upload-area p {
-  font-size: 16px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: var(--text-primary);
+.upload-box h3{
+  margin-bottom:10px;
 }
 
-.upload-area span {
-  font-size: 14px;
-  color: var(--text-secondary);
+.upload-box p{
+  color:var(--muted);
 }
 
-.upload-input {
-  display: none;
+input[type=file]{
+  display:none;
 }
 
-.image-preview {
-  width: 100%;
-  border-radius: 12px;
-  margin: 20px 0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  max-height: 400px;
-  object-fit: contain;
+.image-preview{
+  width:100%;
+  max-height:500px;
+  object-fit:contain;
+  border-radius:12px;
+  margin-bottom:25px;
+  display:none;
+  border:1px solid var(--border);
 }
 
-.table-section {
-  margin-top: 30px;
-  overflow-x: auto;
+.table-wrap{
+  overflow:auto;
+  max-height:75vh;
+  border-radius:12px;
+  border:1px solid var(--border);
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 13px;
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:'JetBrains Mono',monospace;
+  font-size:14px;
 }
 
-thead {
-  background: rgba(30, 41, 59, 0.8);
-  position: sticky;
-  top: 0;
-  z-index: 10;
+thead{
+  position:sticky;
+  top:0;
+  background:#0f172a;
+  z-index:10;
 }
 
-th {
-  padding: 14px 8px;
-  text-align: center;
-  font-weight: 700;
-  color: var(--accent-light);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid var(--accent);
+th{
+  padding:14px;
+  border-bottom:2px solid var(--accent);
+  color:var(--accent2);
 }
 
-td {
-  padding: 12px 8px;
-  text-align: center;
-  border-bottom: 1px solid var(--border);
-  transition: all 0.2s ease;
+td{
+  padding:12px;
+  text-align:center;
+  border-bottom:1px solid var(--border);
+  transition:.2s;
 }
 
-tr:hover td {
-  background: rgba(60, 130, 246, 0.05);
+tr:hover td{
+  background:rgba(59,130,246,.05);
 }
 
-td[contenteditable="true"] {
-  background: rgba(60, 130, 246, 0.15);
-  cursor: text;
-  border-radius: 4px;
-  color: var(--text-primary);
+td[contenteditable=true]{
+  background:rgba(59,130,246,.08);
 }
 
-td[contenteditable="true"]:focus {
-  outline: none;
-  background: rgba(60, 130, 246, 0.25);
-  box-shadow: inset 0 0 0 2px var(--accent);
+td[contenteditable=true]:focus{
+  outline:none;
+  background:rgba(59,130,246,.18);
+  box-shadow:inset 0 0 0 2px var(--accent);
 }
 
-.kw {
-  background: rgba(251, 146, 60, 0.2) !important;
-  color: #fb923c !important;
-  font-weight: 700 !important;
-  border-radius: 4px;
+.kw{
+  background:rgba(251,146,60,.18)!important;
+  color:#fb923c;
+  font-weight:700;
 }
 
-.d {
-  background: rgba(34, 197, 94, 0.2) !important;
-  color: #4ade80 !important;
-  font-weight: 700 !important;
-  border-radius: 4px;
+.d{
+  background:rgba(34,197,94,.18)!important;
+  color:#4ade80;
+  font-weight:700;
 }
 
-.x {
-  background: rgba(239, 68, 68, 0.2) !important;
-  color: #fca5a5 !important;
-  font-weight: 700 !important;
-  border-radius: 4px;
+.x{
+  background:rgba(239,68,68,.18)!important;
+  color:#fca5a5;
+  font-weight:700;
 }
 
-.d-star {
-  background: rgba(168, 85, 247, 0.2) !important;
-  color: #d8b4fe !important;
-  font-weight: 700 !important;
-  border-radius: 4px;
+.dstar{
+  background:rgba(168,85,247,.18)!important;
+  color:#d8b4fe;
+  font-weight:700;
 }
 
-.action-bar {
-  margin-top: 25px;
-  display: flex;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
+.total-box{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;
 }
 
-.btn {
-  padding: 12px 28px;
-  font-size: 14px;
-  font-weight: 600;
-  font-family: 'Outfit', sans-serif;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+.total{
+  background:#0f172a;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px;
 }
 
-.btn-primary {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 8px 16px rgba(60, 130, 246, 0.3);
+.total h3{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:8px;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(60, 130, 246, 0.4);
+.total p{
+  font-size:34px;
+  font-weight:900;
 }
 
-.btn-secondary {
-  background: rgba(30, 41, 59, 0.8);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
+.actions{
+  margin-top:24px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
 }
 
-.btn-secondary:hover {
-  border-color: var(--accent);
-  color: var(--accent-light);
-  transform: translateY(-2px);
+button{
+  border:none;
+  border-radius:10px;
+  padding:13px 24px;
+  font-weight:700;
+  cursor:pointer;
+  transition:.25s;
+  font-family:'Outfit',sans-serif;
 }
 
-.extraction-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+.primary{
+  background:var(--accent);
+  color:white;
 }
 
-.extraction-modal.active {
-  display: flex;
+.secondary{
+  background:#1e293b;
+  color:white;
+  border:1px solid var(--border);
 }
 
-.modal-content {
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 30px;
-  max-width: 600px;
-  width: 100%;
-  max-height: 80vh;
-  overflow-y: auto;
-  animation: slideUp 0.3s ease;
+button:hover{
+  transform:translateY(-2px);
 }
 
-.modal-title {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--accent-light);
-  margin-bottom: 20px;
-}
+@media(max-width:768px){
 
-.modal-input-group {
-  margin-bottom: 16px;
-}
-
-.modal-input-group label {
-  display: block;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.modal-input-group input {
-  width: 100%;
-  padding: 10px 12px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text-primary);
-  font-family: 'Outfit', sans-serif;
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.modal-input-group input:focus {
-  outline: none;
-  border-color: var(--accent);
-  background: rgba(60, 130, 246, 0.1);
-}
-
-.modal-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 25px;
-}
-
-.modal-buttons button {
-  flex: 1;
-  padding: 12px;
-  font-weight: 600;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-family: 'Outfit', sans-serif;
-}
-
-.modal-btn-confirm {
-  background: var(--accent);
-  color: white;
-}
-
-.modal-btn-confirm:hover {
-  box-shadow: 0 8px 16px rgba(60, 130, 246, 0.3);
-}
-
-.modal-btn-cancel {
-  background: rgba(30, 41, 59, 0.8);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.modal-btn-cancel:hover {
-  border-color: var(--accent);
-}
-
-.info-box {
-  background: rgba(60, 130, 246, 0.1);
-  border-left: 4px solid var(--accent);
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.info-box strong {
-  color: var(--accent-light);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
+  .header h1{
+    font-size:38px;
   }
-  to {
-    opacity: 1;
-  }
-}
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
+  table{
+    font-size:12px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
+  th,td{
+    padding:8px 5px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
 
-@media (max-width: 768px) {
-  .header h1 { font-size: 36px; }
-  .tabs-container { gap: 8px; }
-  .tab-btn { padding: 10px 16px; font-size: 12px; }
-  .content-card { padding: 20px; }
-  table { font-size: 12px; }
-  th, td { padding: 8px 4px; }
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
   <div class="header">
     <h1>📅 ROOSTER 2026</h1>
-    <p>Professional Schedule Manager</p>
+    <p>Interactive Editable Schedule Manager</p>
   </div>
 
-  <div class="tabs-container" id="monthTabs"></div>
+  <div class="tabs" id="tabs"></div>
 
-  <div class="content-card" id="content"></div>
-</div>
+  <div class="card">
 
-<!-- Upload/Extract Modal -->
-<div class="extraction-modal" id="extractionModal">
-  <div class="modal-content">
-    <h2 class="modal-title">Extract Schedule Data</h2>
-    <div class="info-box">
-      <strong>⚡ Quick Start:</strong> Describe the image content or manually enter the schedule data below.
-    </div>
-    <div class="modal-input-group">
-      <label>Description of Image</label>
-      <input type="text" id="imageDescription" placeholder="E.g., May schedule with shifts...">
-    </div>
-    <div id="manualDataInputs"></div>
-    <div class="modal-buttons">
-      <button class="modal-btn-confirm" onclick="confirmExtraction()">Convert to Table</button>
-      <button class="modal-btn-cancel" onclick="cancelExtraction()">Cancel</button>
-    </div>
-  </div>
-</div>
+    <h2 class="month-title" id="monthTitle"></h2>
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-<script>
+    <label class="upload-box" id="uploadBox">
+      <h3>📸 Upload Rooster Foto</h3>
+      <p>Click or drag image here</p>
+      <input type="file" id="fileInput" accept="image/*">
+    </label>
 
-// ================== MONTH DATA ==================
-const months = ['April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-const monthData = {};
+    <img id="preview" class="image-preview">
 
-// Initialize with sample data for May (expandable)
-const defaultMayData = [
-  ["1","VR","KW","4","X","","DAG VAN ARBEID"],
-  ["2","ZA","D","12","X","",""],
-  ["3","ZO","X","","D","12",""],
-  ["4","MA","D","12","A","12",""],
-  ["5","DI","KW","4","A","12",""],
-  ["6","WO","KW","4","X","",""],
-  ["7","DO","KW","4","R","",""],
-  ["8","VR","D","12","R","",""],
-  ["9","ZA","X","","X","",""],
-  ["10","ZO","X-D","","D-X","12",""],
-  ["11","MA","D-X","12","X-D","",""],
-  ["12","DI","KW","4","A","12",""],
-  ["13","WO","KW","4","A","12",""],
-  ["14","DO","KW","4","X","","HEMELVAART"],
-  ["15","VR","KW","4","R","",""],
-  ["16","ZA","X","","R","",""],
-  ["17","ZO","X","","X","",""],
-  ["18","MA","KW","4","D*","8",""],
-  ["19","DI","KW","4","D*","8",""],
-  ["20","WO","D","12","A","12",""],
-  ["21","DO","KW","4","A","12",""],
-  ["22","VR","KW","4","X","",""],
-  ["23","ZA","D=X","12","R","","VG"],
-  ["24","ZO","X","","R","",""],
-  ["25","MA","KW","4","X","",""],
-  ["26","DI","D","12","X","",""],
-  ["27","WO","KW","4","D*","8",""],
-  ["28","DO","KW","4","A","12",""],
-  ["29","VR","KW","4","A","12",""],
-  ["30","ZA","X","","X","",""],
-  ["31","ZO","X","","R","",""]
-];
-
-// Initialize all months
-months.forEach(month => {
-  const key = month.toLowerCase() + 'Data';
-  monthData[month] = JSON.parse(localStorage.getItem(key)) || 
-    (month === 'May' ? defaultMayData : generateEmptyMonth(month));
-});
-
-function getDaysInMonth(monthName) {
-  const monthMap = {
-    'April': 30, 'May': 31, 'June': 30, 'July': 31,
-    'August': 31, 'September': 30, 'October': 31, 'November': 30, 'December': 31
-  };
-  return monthMap[monthName];
-}
-
-function generateEmptyMonth(monthName) {
-  const days = getDaysInMonth(monthName);
-  const data = [];
-  const dayNames = ['MA', 'DI', 'WO', 'DO', 'VR', 'ZA', 'ZO'];
-  
-  // Calculate starting day (simple calculation)
-  for (let i = 1; i <= days; i++) {
-    data.push([i.toString(), '', '', '', '', '', '']);
-  }
-  return data;
-}
-
-function getHours(v) {
-  v = (v || "").toString().toUpperCase();
-  if (v.includes("D*")) return 8;
-  if (v.includes("D")) return 12;
-  if (v === "A") return 12;
-  if (v.includes("KW")) return 4;
-  return 0;
-}
-
-// ================== RENDER TABS ==================
-function renderTabs() {
-  const container = document.getElementById('monthTabs');
-  container.innerHTML = '';
-  
-  months.forEach((month, idx) => {
-    const btn = document.createElement('button');
-    btn.className = `tab-btn ${idx === 0 ? 'active' : ''}`;
-    btn.textContent = month;
-    btn.onclick = () => switchTab(month);
-    container.appendChild(btn);
-  });
-}
-
-function switchTab(month) {
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.textContent === month);
-  });
-  loadMonth(month);
-}
-
-// ================== LOAD MONTH ==================
-function loadMonth(monthName) {
-  const data = monthData[monthName];
-  
-  let html = `
-    <h2 class="month-title">${monthName} 2026</h2>
-    
-    <div class="upload-section">
-      <label class="upload-label">Upload Schedule Photo</label>
-      <div class="upload-area" onclick="document.getElementById('uploadInput-${monthName}').click()">
-        <p>📸 Click to Upload Rooster Photo</p>
-        <span>or drag and drop an image here</span>
-        <input type="file" id="uploadInput-${monthName}" class="upload-input" accept="image/*" 
-               onchange="handleImageUpload('${monthName}', event)">
-      </div>
-      <img id="preview-${monthName}" class="image-preview" style="display:none;">
-    </div>
-
-    <div class="table-section">
-      <table id="scheduleTable">
+    <div class="table-wrap">
+      <table id="roosterTable">
         <thead>
           <tr>
-            <th>DATUM</th><th>DAG</th><th>GMA</th><th>U</th><th>JPA</th><th>U</th><th>OPMERKING</th>
+            <th>DAG</th>
+            <th>DAT</th>
+            <th>JPA</th>
+            <th>U</th>
+            <th>GMA</th>
+            <th>U</th>
+            <th>TOTAAL</th>
+            <th>OPMERKING</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
 
-    <div class="action-bar">
-      <button class="btn btn-primary" onclick="exportToExcel('${monthName}')">📥 Export Excel</button>
-      <button class="btn btn-secondary" onclick="clearMonth('${monthName}')">🗑️ Clear Data</button>
-    </div>
-  `;
+    <div class="total-box">
 
-  document.getElementById("content").innerHTML = html;
-  renderTable(monthName, data);
-  
-  // Load saved image if exists
-  const savedImg = localStorage.getItem('img_' + monthName);
-  if (savedImg) {
-    const imgEl = document.getElementById('preview-' + monthName);
-    imgEl.src = savedImg;
-    imgEl.style.display = 'block';
+      <div class="total">
+        <h3>JPA HOURS</h3>
+        <p id="jpaTotal">0</p>
+      </div>
+
+      <div class="total">
+        <h3>GMA HOURS</h3>
+        <p id="gmaTotal">0</p>
+      </div>
+
+      <div class="total">
+        <h3>TOTAL HOURS</h3>
+        <p id="grandTotal">0</p>
+      </div>
+
+    </div>
+
+    <div class="actions">
+      <button class="primary" onclick="saveCurrentMonth()">💾 Save</button>
+      <button class="secondary" onclick="exportCSV()">📥 Export CSV</button>
+      <button class="secondary" onclick="resetMonth()">🗑️ Reset Month</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+
+const months = [
+"April",
+"May",
+"June",
+"July",
+"August",
+"September",
+"October",
+"November",
+"December"
+];
+
+let currentMonth = "May";
+
+const monthData = {
+
+May: [
+["VR","1","KW","4","X","0","4","DAG VAN ARBEID"],
+["ZA","2","D","12","X","0","12",""],
+["ZO","3","X","0","D","12","12",""],
+["MA","4","D","12","A","12","24",""],
+["DI","5","KW","4","A","12","16",""],
+["WO","6","KW","4","X","0","4",""],
+["DO","7","KW","4","R","0","4",""],
+["VR","8","D","12","R","0","12",""],
+["ZA","9","X","0","X","0","0",""],
+["ZO","10","X-D","12","D-X","12","24",""],
+["MA","11","D-X","12","X-D","12","24",""],
+["DI","12","KW","4","A","12","16",""],
+["WO","13","KW","4","A","12","16",""],
+["DO","14","KW","4","X","0","4","HEMELVAART"],
+["VR","15","KW","4","R","0","4",""],
+["ZA","16","X","0","R","0","0",""],
+["ZO","17","X","0","X","0","0",""],
+["MA","18","KW","4","D*","8","12",""],
+["DI","19","KW","4","D*","8","12",""],
+["WO","20","D","12","A","12","24",""],
+["DO","21","KW","4","A","12","16",""],
+["VR","22","KW","4","X","0","4",""],
+["ZA","23","D=X","12","R","0","12","VG"],
+["ZO","24","X","0","R","0","0",""],
+["MA","25","KW","4","X","0","4",""],
+["DI","26","D","12","X","0","12",""],
+["WO","27","KW","4","D*","8","12",""],
+["DO","28","KW","4","A","12","16",""],
+["VR","29","KW","4","A","12","16",""],
+["ZA","30","X","0","X","0","0",""],
+["ZO","31","X","0","R","0","0",""]
+],
+
+June: [
+["MA","1","R","0","D","12","12",""],
+["DI","2","X","0","KW","4","4",""],
+["WO","3","D*","8","KW","4","12",""],
+["DO","4","D*","8","KW","4","12",""],
+["VR","5","A","12","KW","4","16",""],
+["ZA","6","A","12","X","0","12",""],
+["ZO","7","X","0","X","0","0",""],
+["MA","8","R","0","KW","4","4",""],
+["DI","9","R","0","D","12","12",""],
+["WO","10","X","0","KW","4","4",""],
+["DO","11","X","0","D","12","12",""],
+["VR","12","D*","8","KW","4","12",""],
+["ZA","13","A","12","X","0","12",""],
+["ZO","14","A","12","X","0","12",""],
+["MA","15","X","0","KW","4","4",""],
+["DI","16","R","0","KW","4","4",""],
+["WO","17","R","0","D","12","12",""],
+["DO","18","X","0","KW","4","4",""],
+["VR","19","D*","8","KW","4","12",""],
+["ZA","20","D","12","X","0","12",""],
+["ZO","21","A","12","X","0","12",""],
+["MA","22","A","12","KW","4","16",""],
+["DI","23","X","0","KW","4","4",""],
+["WO","24","R","0","KW","4","4",""],
+["DO","25","R","0","KW","4","4",""],
+["VR","26","X","0","KW","4","4",""],
+["ZA","27","X","0","D","12","12",""],
+["ZO","28","D","12","X","0","12",""],
+["MA","29","A","12","D","12","24",""],
+["DI","30","A","12","KW","4","16",""]
+]
+
+};
+
+function createEmptyMonth(days){
+
+  const weekdays = ["MA","DI","WO","DO","VR","ZA","ZO"];
+
+  const arr = [];
+
+  for(let i=1;i<=days;i++){
+
+    arr.push([
+      weekdays[(i-1)%7],
+      i,
+      "",
+      "0",
+      "",
+      "0",
+      "0",
+      ""
+    ]);
+
   }
+
+  return arr;
+
 }
 
-function renderTable(monthName, data) {
-  const tbody = document.querySelector("#scheduleTable tbody");
+monthData["April"] = createEmptyMonth(30);
+monthData["July"] = createEmptyMonth(31);
+monthData["August"] = createEmptyMonth(31);
+monthData["September"] = createEmptyMonth(30);
+monthData["October"] = createEmptyMonth(31);
+monthData["November"] = createEmptyMonth(30);
+monthData["December"] = createEmptyMonth(31);
+
+const tbody = document.querySelector("#roosterTable tbody");
+
+function getHours(v){
+
+  v = (v || "").toUpperCase().trim();
+
+  if(v.includes("D*")) return 8;
+  if(v.includes("KW")) return 4;
+  if(v.includes("D")) return 12;
+  if(v === "A") return 12;
+
+  return 0;
+
+}
+
+function applyClass(td,val){
+
+  td.classList.remove("kw","d","x","dstar");
+
+  const v = val.toUpperCase();
+
+  if(v.includes("D*")){
+    td.classList.add("dstar");
+  }
+  else if(v.includes("KW")){
+    td.classList.add("kw");
+  }
+  else if(v.includes("X")){
+    td.classList.add("x");
+  }
+  else if(v.includes("D") || v==="A"){
+    td.classList.add("d");
+  }
+
+}
+
+function renderTabs(){
+
+  const tabs = document.getElementById("tabs");
+
+  tabs.innerHTML = "";
+
+  months.forEach(month=>{
+
+    const btn = document.createElement("button");
+
+    btn.className = "tab-btn";
+
+    if(month === currentMonth){
+      btn.classList.add("active");
+    }
+
+    btn.textContent = month;
+
+    btn.onclick = ()=>{
+
+      currentMonth = month;
+
+      renderTabs();
+      renderMonth();
+      loadImage();
+
+    };
+
+    tabs.appendChild(btn);
+
+  });
+
+}
+
+function renderMonth(){
+
+  document.getElementById("monthTitle").textContent =
+    currentMonth + " 2026";
+
   tbody.innerHTML = "";
 
-  data.forEach((row, i) => {
+  const data = monthData[currentMonth];
+
+  data.forEach((row,rowIndex)=>{
+
     const tr = document.createElement("tr");
-    
-    row.forEach((cell, j) => {
+
+    row.forEach((cell,colIndex)=>{
+
       const td = document.createElement("td");
-      td.contentEditable = true;
-      td.textContent = cell || "";
-      
-      // Apply color coding to shift columns
-      if (j === 2 || j === 4) {
-        applyShiftColor(td, cell);
+
+      td.textContent = cell;
+
+      if(colIndex === 2 || colIndex === 4 || colIndex === 7){
+
+        td.contentEditable = true;
+
+        td.addEventListener("paste",(e)=>{
+          e.preventDefault();
+          const text = e.clipboardData.getData("text/plain");
+          document.execCommand("insertText",false,text);
+        });
+
       }
-      
-      td.onblur = () => {
-        data[i][j] = td.textContent.trim();
-        
-        // Auto-calculate hours
-        if (j === 2) {
-          data[i][3] = getHours(data[i][2]);
-          tr.children[3].textContent = data[i][3];
-          applyShiftColor(tr.children[2], data[i][2]);
+
+      if(colIndex === 2 || colIndex === 4){
+        applyClass(td,cell);
+      }
+
+      td.onblur = ()=>{
+
+        monthData[currentMonth][rowIndex][colIndex] =
+          td.textContent.trim().toUpperCase();
+
+        if(colIndex === 2){
+
+          const val = monthData[currentMonth][rowIndex][2];
+
+          monthData[currentMonth][rowIndex][3] =
+            getHours(val);
+
         }
-        if (j === 4) {
-          data[i][5] = getHours(data[i][4]);
-          tr.children[5].textContent = data[i][5];
-          applyShiftColor(tr.children[4], data[i][4]);
+
+        if(colIndex === 4){
+
+          const val = monthData[currentMonth][rowIndex][4];
+
+          monthData[currentMonth][rowIndex][5] =
+            getHours(val);
+
         }
-        
-        saveMonthData(monthName, data);
+
+        const total =
+          Number(monthData[currentMonth][rowIndex][3]) +
+          Number(monthData[currentMonth][rowIndex][5]);
+
+        monthData[currentMonth][rowIndex][6] = total;
+
+        renderMonth();
+        calculateTotals();
+
       };
-      
+
       tr.appendChild(td);
+
     });
-    
+
     tbody.appendChild(tr);
+
   });
+
+  calculateTotals();
+
 }
 
-function applyShiftColor(td, value) {
-  td.classList.remove('kw', 'd', 'x', 'd-star');
-  const v = (value || "").toUpperCase();
-  
-  if (v.includes("D*")) td.classList.add('d-star');
-  else if (v.includes("D")) td.classList.add('d');
-  else if (v.includes("X")) td.classList.add('x');
-  else if (v.includes("KW")) td.classList.add('kw');
+function calculateTotals(){
+
+  let jpa = 0;
+  let gma = 0;
+
+  monthData[currentMonth].forEach(r=>{
+
+    jpa += Number(r[3]);
+    gma += Number(r[5]);
+
+  });
+
+  document.getElementById("jpaTotal").textContent = jpa;
+  document.getElementById("gmaTotal").textContent = gma;
+  document.getElementById("grandTotal").textContent = jpa + gma;
+
 }
 
-// ================== IMAGE UPLOAD & EXTRACTION ==================
-let currentUploadMonth = null;
+function saveCurrentMonth(){
 
-function handleImageUpload(month, e) {
+  localStorage.setItem(
+    "rooster_" + currentMonth,
+    JSON.stringify(monthData[currentMonth])
+  );
+
+  alert(currentMonth + " saved.");
+
+}
+
+function loadSavedMonths(){
+
+  months.forEach(month=>{
+
+    const saved = localStorage.getItem("rooster_" + month);
+
+    if(saved){
+
+      monthData[month] = JSON.parse(saved);
+
+    }
+
+  });
+
+}
+
+function exportCSV(){
+
+  let csv = "DAG,DAT,JPA,U,GMA,U,TOTAAL,OPMERKING\n";
+
+  monthData[currentMonth].forEach(r=>{
+
+    csv += r.join(",") + "\n";
+
+  });
+
+  const blob = new Blob([csv],{type:"text/csv"});
+
+  const a = document.createElement("a");
+
+  a.href = URL.createObjectURL(blob);
+
+  a.download = currentMonth + "_2026.csv";
+
+  a.click();
+
+}
+
+function resetMonth(){
+
+  if(confirm("Reset " + currentMonth + "?")){
+
+    localStorage.removeItem("rooster_" + currentMonth);
+
+    location.reload();
+
+  }
+
+}
+
+const uploadBox = document.getElementById("uploadBox");
+const fileInput = document.getElementById("fileInput");
+const preview = document.getElementById("preview");
+
+uploadBox.addEventListener("dragover",(e)=>{
+
+  e.preventDefault();
+
+  uploadBox.classList.add("dragging");
+
+});
+
+uploadBox.addEventListener("dragleave",()=>{
+
+  uploadBox.classList.remove("dragging");
+
+});
+
+uploadBox.addEventListener("drop",(e)=>{
+
+  e.preventDefault();
+
+  uploadBox.classList.remove("dragging");
+
+  const file = e.dataTransfer.files[0];
+
+  if(file){
+
+    fileInput.files = e.dataTransfer.files;
+
+    showImage(file);
+
+  }
+
+});
+
+fileInput.addEventListener("change",(e)=>{
+
   const file = e.target.files[0];
-  if (!file) return;
+
+  if(file){
+    showImage(file);
+  }
+
+});
+
+function showImage(file){
 
   const reader = new FileReader();
-  reader.onload = (ev) => {
-    const imgData = ev.target.result;
-    localStorage.setItem('img_' + month, imgData);
-    
-    const imgEl = document.getElementById('preview-' + month);
-    imgEl.src = imgData;
-    imgEl.style.display = 'block';
-    
-    currentUploadMonth = month;
-    openExtractionModal();
+
+  reader.onload = (e)=>{
+
+    preview.src = e.target.result;
+
+    preview.style.display = "block";
+
+    localStorage.setItem(
+      "image_" + currentMonth,
+      e.target.result
+    );
+
   };
+
   reader.readAsDataURL(file);
+
 }
 
-function openExtractionModal() {
-  document.getElementById('extractionModal').classList.add('active');
-}
+function loadImage(){
 
-function cancelExtraction() {
-  document.getElementById('extractionModal').classList.remove('active');
-  document.getElementById('imageDescription').value = '';
-}
+  const img = localStorage.getItem(
+    "image_" + currentMonth
+  );
 
-function confirmExtraction() {
-  const description = document.getElementById('imageDescription').value || '';
-  
-  // For now, just close and let user manually edit
-  // In a real app, you'd use Claude API to extract data
-  alert('Image uploaded! 📸\n\nYou can now manually edit the table or use the image as reference.\n\nTip: Use the format:\nDATA - DAY - SHIFT - HOURS - SHIFT - HOURS - NOTES');
-  
-  cancelExtraction();
-}
+  if(img){
 
-function saveMonthData(month, data) {
-  localStorage.setItem(month.toLowerCase() + 'Data', JSON.stringify(data));
-}
+    preview.src = img;
 
-function exportToExcel(month) {
-  const data = monthData[month];
-  const headers = ['DATUM', 'DAG', 'GMA', 'U', 'JPA', 'U', 'OPMERKING'];
-  const wsData = [headers, ...data];
-  
-  const ws = XLSX.utils.aoa_to_sheet(wsData);
-  ws['!cols'] = [{wch: 8}, {wch: 6}, {wch: 10}, {wch: 5}, {wch: 10}, {wch: 5}, {wch: 20}];
-  
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, month);
-  XLSX.writeFile(wb, `Rooster_${month}_2026.xlsx`);
-}
+    preview.style.display = "block";
 
-function clearMonth(month) {
-  if (confirm(`Clear all data for ${month}? This cannot be undone.`)) {
-    monthData[month] = generateEmptyMonth(month);
-    saveMonthData(month, monthData[month]);
-    loadMonth(month);
+  }else{
+
+    preview.style.display = "none";
+
   }
+
 }
 
-// ================== INIT ==================
+loadSavedMonths();
 renderTabs();
-switchTab('April');
+renderMonth();
+loadImage();
 
 </script>
 
