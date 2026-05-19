@@ -3,804 +3,666 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ROOSTER 2026 - Full Schedule Manager</title>
-
+<title>ROOSTER OBSERVATOREN 2026</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=JetBrains+Mono:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&family=JetBrains+Mono:wght@500;700&display=swap');
 
-:root{
-  --bg:#0b1020;
-  --card:#131c31;
-  --border:#23304d;
-  --accent:#3b82f6;
-  --accent2:#60a5fa;
-  --text:#f1f5f9;
-  --muted:#94a3b8;
-  --green:#22c55e;
-  --orange:#fb923c;
-  --red:#ef4444;
-  --purple:#a855f7;
+:root {
+  --bg:     #060b1a;
+  --card:   #0d1526;
+  --panel:  #111e35;
+  --accent: #3b82f6;
+  --acl:    #60a5fa;
+  --green:  #4ade80;
+  --tp:     #f1f5f9;
+  --ts:     #94a3b8;
+  --bdr:    #1e2d45;
 }
 
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: radial-gradient(ellipse at top, #0d1a3a 0%, var(--bg) 65%);
+  color: var(--tp);
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  padding: 20px 16px 40px;
 }
 
-body{
-  background:linear-gradient(135deg,#050816,#0f172a);
-  color:var(--text);
+.container { max-width: 1300px; margin: 0 auto; }
+
+/* HEADER */
+.header { text-align:center; margin-bottom:28px; }
+.header h1 {
+  font-size: 42px; font-weight: 900; letter-spacing:-1px;
+  background: linear-gradient(120deg, var(--acl), var(--accent));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.header p { color:var(--ts); font-size:12px; margin-top:4px; }
+
+/* TABS */
+.tabs-wrap {
+  background: var(--card); border:1px solid var(--bdr);
+  border-radius:12px; padding:10px;
+  display:flex; flex-wrap:wrap; gap:5px; justify-content:center;
+  margin-bottom:18px;
+}
+.tab-btn {
+  padding:7px 14px; font-size:10px; font-weight:700;
   font-family:'Outfit',sans-serif;
-  min-height:100vh;
-  padding:24px;
+  background:var(--panel); border:1px solid var(--bdr);
+  border-radius:5px; color:var(--ts); cursor:pointer;
+  text-transform:uppercase; letter-spacing:0.5px;
+  transition:all 0.2s;
+}
+.tab-btn:hover { border-color:var(--accent); color:var(--acl); }
+.tab-btn.active {
+  background:var(--accent); color:#fff;
+  border-color:var(--accent);
+  box-shadow:0 4px 14px rgba(59,130,246,0.4);
 }
 
-.container{
-  max-width:1500px;
-  margin:auto;
+/* CARD */
+.card {
+  background:var(--card); border:1px solid var(--bdr);
+  border-radius:14px; padding:20px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.5);
 }
 
-.header{
-  text-align:center;
-  margin-bottom:30px;
+/* MONTH TITLE */
+.month-heading {
+  font-size:20px; font-weight:800; color:var(--acl);
+  text-align:center; margin-bottom:16px;
+  letter-spacing:0.5px;
 }
 
-.header h1{
-  font-size:56px;
-  font-weight:900;
-  background:linear-gradient(135deg,var(--accent2),var(--accent));
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
+/* STATS */
+.stats-row {
+  display:grid; grid-template-columns:repeat(5,1fr);
+  gap:8px; margin-bottom:16px;
+}
+.stat {
+  background:var(--panel); border:1px solid var(--bdr);
+  border-radius:8px; padding:10px 6px; text-align:center;
+  transition:transform 0.2s;
+}
+.stat:hover { transform:translateY(-2px); }
+.stat.gma-stat { border-color:var(--green); background:rgba(74,222,128,0.07); }
+.stat-name { font-size:9px; font-weight:700; color:var(--ts); text-transform:uppercase; letter-spacing:0.6px; margin-bottom:4px; }
+.stat.gma-stat .stat-name { color:var(--green); }
+.stat-hrs { font-size:24px; font-weight:900; font-family:'JetBrains Mono',monospace; color:var(--acl); }
+.stat.gma-stat .stat-hrs { color:var(--green); }
+.stat-lbl { font-size:9px; color:var(--ts); margin-top:2px; }
+
+/* LEGEND */
+.legend {
+  display:flex; gap:8px; flex-wrap:wrap;
+  background:var(--panel); border:1px solid var(--bdr);
+  border-radius:8px; padding:8px 12px; margin-bottom:14px;
+  font-size:10px;
+}
+.leg { display:flex; align-items:center; gap:4px; }
+.leg-box {
+  width:20px; height:20px; border-radius:3px;
+  font-size:8px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
 }
 
-.header p{
-  color:var(--muted);
-  margin-top:8px;
-}
-
-.tabs{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-bottom:25px;
-  justify-content:center;
-}
-
-.tab-btn{
-  padding:12px 22px;
-  border:none;
-  border-radius:10px;
-  background:#172036;
-  color:var(--text);
-  cursor:pointer;
-  transition:.25s;
-  font-weight:700;
-}
-
-.tab-btn:hover{
-  transform:translateY(-2px);
-}
-
-.tab-btn.active{
-  background:var(--accent);
-}
-
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:18px;
-  padding:24px;
-  box-shadow:0 20px 60px rgba(0,0,0,.45);
-}
-
-.month-title{
-  font-size:34px;
-  margin-bottom:24px;
-  color:var(--accent2);
-  text-align:center;
-}
-
-.upload-box{
+/* UPLOAD */
+.upload-zone {
   border:2px dashed var(--accent);
-  border-radius:14px;
-  padding:34px;
-  text-align:center;
-  margin-bottom:25px;
-  background:rgba(59,130,246,.05);
-  cursor:pointer;
-  transition:.25s;
+  border-radius:10px; padding:16px;
+  text-align:center; cursor:pointer;
+  transition:all 0.25s; margin-bottom:14px;
+  background:rgba(59,130,246,0.04);
+  user-select:none;
 }
-
-.upload-box:hover{
-  background:rgba(59,130,246,.12);
+.upload-zone:hover, .upload-zone.drag-over {
+  border-color:var(--acl); background:rgba(59,130,246,0.1);
 }
+.upload-zone .up-icon { font-size:26px; line-height:1; margin-bottom:6px; }
+.upload-zone p { font-size:13px; font-weight:700; color:var(--acl); margin-bottom:2px; }
+.upload-zone span { font-size:10px; color:var(--ts); }
 
-.upload-box.dragging{
-  background:rgba(96,165,250,.16);
+/* image preview */
+.img-wrap { position:relative; margin-bottom:14px; }
+.img-wrap img {
+  width:100%; max-height:300px; object-fit:contain;
+  border-radius:8px; border:1px solid var(--bdr);
+  display:block;
 }
-
-.upload-box h3{
-  margin-bottom:10px;
+.img-remove {
+  position:absolute; top:8px; right:8px;
+  background:rgba(239,68,68,0.85); color:#fff;
+  border:none; border-radius:5px;
+  padding:5px 10px; font-size:11px; font-weight:700;
+  cursor:pointer; font-family:'Outfit',sans-serif;
+  transition:background 0.15s;
 }
+.img-remove:hover { background:#ef4444; }
 
-.upload-box p{
-  color:var(--muted);
-}
-
-input[type=file]{
-  display:none;
-}
-
-.image-preview{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-  border-radius:12px;
-  margin-bottom:25px;
-  display:none;
-  border:1px solid var(--border);
-}
-
-.table-wrap{
-  overflow:auto;
-  max-height:75vh;
-  border-radius:12px;
-  border:1px solid var(--border);
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  font-family:'JetBrains Mono',monospace;
-  font-size:14px;
-}
-
-thead{
-  position:sticky;
-  top:0;
-  background:#0f172a;
-  z-index:10;
-}
-
-th{
-  padding:14px;
+/* TABLE */
+.tbl-wrap { overflow-x:auto; border-radius:10px; border:1px solid var(--bdr); margin-bottom:14px; }
+table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:12px; }
+thead { background:var(--panel); position:sticky; top:0; z-index:5; }
+th {
+  padding:10px 8px; text-align:center; font-size:10px; font-weight:800;
+  color:var(--acl); text-transform:uppercase; letter-spacing:0.7px;
   border-bottom:2px solid var(--accent);
-  color:var(--accent2);
 }
-
-td{
-  padding:12px;
-  text-align:center;
-  border-bottom:1px solid var(--border);
-  transition:.2s;
+th.gma-th { color:var(--green); border-bottom-color:var(--green); background:rgba(74,222,128,0.06); }
+td { padding:9px 7px; text-align:center; border-bottom:1px solid var(--bdr); font-weight:500; }
+tbody tr:hover td { background:rgba(59,130,246,0.04); }
+td.lbl { font-weight:700; color:var(--acl); font-size:11px; }
+td[contenteditable=true] {
+  cursor:text; border-radius:3px; min-width:42px;
+  transition:background 0.15s, box-shadow 0.15s;
 }
-
-tr:hover td{
-  background:rgba(59,130,246,.05);
-}
-
-td[contenteditable=true]{
-  background:rgba(59,130,246,.08);
-}
-
-td[contenteditable=true]:focus{
+td[contenteditable=true]:hover { background:rgba(59,130,246,0.1) !important; }
+td[contenteditable=true]:focus {
   outline:none;
-  background:rgba(59,130,246,.18);
-  box-shadow:inset 0 0 0 2px var(--accent);
+  box-shadow:inset 0 0 0 2px var(--acl) !important;
+  background:rgba(59,130,246,0.2) !important;
+}
+td.gma-col {
+  background:rgba(74,222,128,0.06);
+  border-left:2px solid rgba(74,222,128,0.25);
+}
+/* shift colours */
+.sk  { background:rgba(251,146,60,0.22)  !important; color:#fb923c !important; font-weight:700; }
+.sd  { background:rgba(34,197,94,0.22)   !important; color:#4ade80 !important; font-weight:700; }
+.sds { background:rgba(168,85,247,0.22)  !important; color:#d8b4fe !important; font-weight:700; }
+.sa  { background:rgba(20,184,166,0.22)  !important; color:#5eead4 !important; font-weight:700; }
+.sx  { background:rgba(100,116,139,0.15) !important; color:#94a3b8 !important; }
+.sr  { background:rgba(59,130,246,0.18)  !important; color:#93c5fd !important; font-weight:700; }
+.sv  { background:rgba(100,116,139,0.22) !important; color:#94a3b8 !important; font-style:italic; }
+/* tfoot */
+tfoot td {
+  font-weight:900; font-size:12px;
+  background:rgba(59,130,246,0.16) !important;
+  color:var(--acl) !important;
+  border-top:2px solid var(--accent);
+}
+tfoot td.gma-col {
+  background:rgba(74,222,128,0.16) !important;
+  color:var(--green) !important;
+  border-top-color:var(--green);
 }
 
-.kw{
-  background:rgba(251,146,60,.18)!important;
-  color:#fb923c;
-  font-weight:700;
+/* ACTIONS */
+.actions { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:4px; }
+.btn {
+  padding:9px 18px; font-size:11px; font-weight:700;
+  font-family:'Outfit',sans-serif; border:none; border-radius:6px;
+  cursor:pointer; transition:all 0.2s;
+  text-transform:uppercase; letter-spacing:0.5px;
 }
+.btn-blue  { background:var(--accent); color:#fff; box-shadow:0 4px 12px rgba(59,130,246,0.35); }
+.btn-blue:hover  { transform:translateY(-1px); box-shadow:0 6px 16px rgba(59,130,246,0.45); }
+.btn-ghost { background:var(--panel); color:var(--ts); border:1px solid var(--bdr); }
+.btn-ghost:hover { border-color:var(--accent); color:var(--acl); }
 
-.d{
-  background:rgba(34,197,94,.18)!important;
-  color:#4ade80;
-  font-weight:700;
+/* TOAST */
+#toast {
+  position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(10px);
+  background:#1a3050; border:1px solid var(--accent); border-radius:8px;
+  padding:10px 22px; font-size:13px; font-weight:600;
+  color:var(--acl); opacity:0; transition:opacity 0.3s, transform 0.3s;
+  pointer-events:none; z-index:9999; white-space:nowrap;
 }
+#toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-.x{
-  background:rgba(239,68,68,.18)!important;
-  color:#fca5a5;
-  font-weight:700;
-}
+/* OPMERKING col */
+.op-col { max-width:120px; font-size:10px; color:var(--ts); text-align:left; padding-left:8px; }
 
-.dstar{
-  background:rgba(168,85,247,.18)!important;
-  color:#d8b4fe;
-  font-weight:700;
-}
-
-.total-box{
-  margin-top:24px;
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:16px;
-}
-
-.total{
-  background:#0f172a;
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:18px;
-}
-
-.total h3{
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:8px;
-}
-
-.total p{
-  font-size:34px;
-  font-weight:900;
-}
-
-.actions{
-  margin-top:24px;
-  display:flex;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-button{
-  border:none;
-  border-radius:10px;
-  padding:13px 24px;
-  font-weight:700;
-  cursor:pointer;
-  transition:.25s;
-  font-family:'Outfit',sans-serif;
-}
-
-.primary{
-  background:var(--accent);
-  color:white;
-}
-
-.secondary{
-  background:#1e293b;
-  color:white;
-  border:1px solid var(--border);
-}
-
-button:hover{
-  transform:translateY(-2px);
-}
-
-@media(max-width:768px){
-
-  .header h1{
-    font-size:38px;
-  }
-
-  table{
-    font-size:12px;
-  }
-
-  th,td{
-    padding:8px 5px;
-  }
-
+@media(max-width:700px){
+  .header h1 { font-size:28px; }
+  .stats-row { grid-template-columns:repeat(3,1fr); }
+  .card { padding:12px; }
+  th,td { padding:7px 4px; font-size:10px; }
+  .tab-btn { font-size:9px; padding:6px 10px; }
 }
 </style>
 </head>
-
 <body>
-
 <div class="container">
 
   <div class="header">
-    <h1>📅 ROOSTER 2026</h1>
-    <p>Interactive Editable Schedule Manager</p>
+    <h1>📅 ROOSTER OBSERVATOREN 2026</h1>
+    <p>Klik een cel om te bewerken &nbsp;•&nbsp; Uren worden automatisch berekend</p>
   </div>
 
-  <div class="tabs" id="tabs"></div>
+  <div class="tabs-wrap" id="tabs"></div>
+  <div class="card"      id="card"></div>
 
-  <div class="card">
-
-    <h2 class="month-title" id="monthTitle"></h2>
-
-    <label class="upload-box" id="uploadBox">
-      <h3>📸 Upload Rooster Foto</h3>
-      <p>Click or drag image here</p>
-      <input type="file" id="fileInput" accept="image/*">
-    </label>
-
-    <img id="preview" class="image-preview">
-
-    <div class="table-wrap">
-      <table id="roosterTable">
-        <thead>
-          <tr>
-            <th>DAG</th>
-            <th>DAT</th>
-            <th>JPA</th>
-            <th>U</th>
-            <th>GMA</th>
-            <th>U</th>
-            <th>TOTAAL</th>
-            <th>OPMERKING</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="total-box">
-
-      <div class="total">
-        <h3>JPA HOURS</h3>
-        <p id="jpaTotal">0</p>
-      </div>
-
-      <div class="total">
-        <h3>GMA HOURS</h3>
-        <p id="gmaTotal">0</p>
-      </div>
-
-      <div class="total">
-        <h3>TOTAL HOURS</h3>
-        <p id="grandTotal">0</p>
-      </div>
-
-    </div>
-
-    <div class="actions">
-      <button class="primary" onclick="saveCurrentMonth()">💾 Save</button>
-      <button class="secondary" onclick="exportCSV()">📥 Export CSV</button>
-      <button class="secondary" onclick="resetMonth()">🗑️ Reset Month</button>
-    </div>
-
-  </div>
 </div>
+<div id="toast"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
+// ═══════════════════════════════════════════════
+//  CONSTANTS
+// ═══════════════════════════════════════════════
+const COLS   = ['qpi','jpa','ays','fca','gma2'];
+const MONTHS = ['January','February','March','April','May','June',
+                'July','August','September','October','November','December'];
+const MDAYS  = [31,29,31,30,31,30,31,31,30,31,30,31];
+const DNAMES = ['MA','DI','WO','DO','VR','ZA','ZO'];
 
-const months = [
-"April",
-"May",
-"June",
-"July",
-"August",
-"September",
-"October",
-"November",
-"December"
-];
-
-let currentMonth = "May";
-
-const monthData = {
-
-May: [
-["VR","1","KW","4","X","0","4","DAG VAN ARBEID"],
-["ZA","2","D","12","X","0","12",""],
-["ZO","3","X","0","D","12","12",""],
-["MA","4","D","12","A","12","24",""],
-["DI","5","KW","4","A","12","16",""],
-["WO","6","KW","4","X","0","4",""],
-["DO","7","KW","4","R","0","4",""],
-["VR","8","D","12","R","0","12",""],
-["ZA","9","X","0","X","0","0",""],
-["ZO","10","X-D","12","D-X","12","24",""],
-["MA","11","D-X","12","X-D","12","24",""],
-["DI","12","KW","4","A","12","16",""],
-["WO","13","KW","4","A","12","16",""],
-["DO","14","KW","4","X","0","4","HEMELVAART"],
-["VR","15","KW","4","R","0","4",""],
-["ZA","16","X","0","R","0","0",""],
-["ZO","17","X","0","X","0","0",""],
-["MA","18","KW","4","D*","8","12",""],
-["DI","19","KW","4","D*","8","12",""],
-["WO","20","D","12","A","12","24",""],
-["DO","21","KW","4","A","12","16",""],
-["VR","22","KW","4","X","0","4",""],
-["ZA","23","D=X","12","R","0","12","VG"],
-["ZO","24","X","0","R","0","0",""],
-["MA","25","KW","4","X","0","4",""],
-["DI","26","D","12","X","0","12",""],
-["WO","27","KW","4","D*","8","12",""],
-["DO","28","KW","4","A","12","16",""],
-["VR","29","KW","4","A","12","16",""],
-["ZA","30","X","0","X","0","0",""],
-["ZO","31","X","0","R","0","0",""]
-],
-
-June: [
-["MA","1","R","0","D","12","12",""],
-["DI","2","X","0","KW","4","4",""],
-["WO","3","D*","8","KW","4","12",""],
-["DO","4","D*","8","KW","4","12",""],
-["VR","5","A","12","KW","4","16",""],
-["ZA","6","A","12","X","0","12",""],
-["ZO","7","X","0","X","0","0",""],
-["MA","8","R","0","KW","4","4",""],
-["DI","9","R","0","D","12","12",""],
-["WO","10","X","0","KW","4","4",""],
-["DO","11","X","0","D","12","12",""],
-["VR","12","D*","8","KW","4","12",""],
-["ZA","13","A","12","X","0","12",""],
-["ZO","14","A","12","X","0","12",""],
-["MA","15","X","0","KW","4","4",""],
-["DI","16","R","0","KW","4","4",""],
-["WO","17","R","0","D","12","12",""],
-["DO","18","X","0","KW","4","4",""],
-["VR","19","D*","8","KW","4","12",""],
-["ZA","20","D","12","X","0","12",""],
-["ZO","21","A","12","X","0","12",""],
-["MA","22","A","12","KW","4","16",""],
-["DI","23","X","0","KW","4","4",""],
-["WO","24","R","0","KW","4","4",""],
-["DO","25","R","0","KW","4","4",""],
-["VR","26","X","0","KW","4","4",""],
-["ZA","27","X","0","D","12","12",""],
-["ZO","28","D","12","X","0","12",""],
-["MA","29","A","12","D","12","24",""],
-["DI","30","A","12","KW","4","16",""]
-]
-
+// ═══════════════════════════════════════════════
+//  PRE-LOADED DATA
+// ═══════════════════════════════════════════════
+const PRESET = {
+  May:[
+    {date:1, day:'VR',qpi:'R', jpa:'X', ays:'A',  fca:'D*',gma2:'KW'},
+    {date:2, day:'ZA',qpi:'R', jpa:'X', ays:'X',  fca:'A', gma2:'D'},
+    {date:3, day:'ZO',qpi:'X', jpa:'D', ays:'R',  fca:'A', gma2:'X'},
+    {date:4, day:'MA',qpi:'X', jpa:'A', ays:'R',  fca:'X', gma2:'D'},
+    {date:5, day:'DI',qpi:'D*',jpa:'A', ays:'X',  fca:'R', gma2:'KW'},
+    {date:6, day:'WO',qpi:'A', jpa:'X', ays:'D*', fca:'R', gma2:'KW'},
+    {date:7, day:'DO',qpi:'A', jpa:'R', ays:'D*', fca:'X', gma2:'KW'},
+    {date:8, day:'VR',qpi:'X', jpa:'R', ays:'A',  fca:'X', gma2:'D'},
+    {date:9, day:'ZA',qpi:'R', jpa:'X', ays:'A',  fca:'D', gma2:'X'},
+    {date:10,day:'ZO',qpi:'R', jpa:'D', ays:'X',  fca:'A', gma2:'X'},
+    {date:11,day:'MA',qpi:'X', jpa:'X', ays:'R',  fca:'A', gma2:'D'},
+    {date:12,day:'DI',qpi:'D*',jpa:'A', ays:'R',  fca:'X', gma2:'KW'},
+    {date:13,day:'WO',qpi:'D*',jpa:'A', ays:'X',  fca:'R', gma2:'KW'},
+    {date:14,day:'DO',qpi:'A', jpa:'X', ays:'D*', fca:'R', gma2:'KW'},
+    {date:15,day:'VR',qpi:'A', jpa:'R', ays:'D*', fca:'X', gma2:'KW'},
+    {date:16,day:'ZA',qpi:'X', jpa:'R', ays:'A',  fca:'D', gma2:'X'},
+    {date:17,day:'ZO',qpi:'R', jpa:'X', ays:'A',  fca:'D', gma2:'X'},
+    {date:18,day:'MA',qpi:'R', jpa:'D*',ays:'X',  fca:'A', gma2:'KW'},
+    {date:19,day:'DI',qpi:'X', jpa:'D*',ays:'R',  fca:'A', gma2:'KW'},
+    {date:20,day:'WO',qpi:'X', jpa:'A', ays:'R',  fca:'X', gma2:'D'},
+    {date:21,day:'DO',qpi:'D*',jpa:'A', ays:'X',  fca:'R', gma2:'KW'},
+    {date:22,day:'VR',qpi:'A', jpa:'X', ays:'D*', fca:'R', gma2:'KW'},
+    {date:23,day:'ZA',qpi:'A', jpa:'R', ays:'X',  fca:'X', gma2:'D'},
+    {date:24,day:'ZO',qpi:'X', jpa:'R', ays:'A',  fca:'D', gma2:'X'},
+    {date:25,day:'MA',qpi:'R', jpa:'X', ays:'A',  fca:'D*',gma2:'KW'},
+    {date:26,day:'DI',qpi:'R', jpa:'X', ays:'X',  fca:'A', gma2:'D'},
+    {date:27,day:'WO',qpi:'X', jpa:'D*',ays:'R',  fca:'A', gma2:'KW'},
+    {date:28,day:'DO',qpi:'D*',jpa:'A', ays:'R',  fca:'X', gma2:'KW'},
+    {date:29,day:'VR',qpi:'D*',jpa:'A', ays:'X',  fca:'R', gma2:'KW'},
+    {date:30,day:'ZA',qpi:'A', jpa:'X', ays:'D',  fca:'R', gma2:'X'},
+    {date:31,day:'ZO',qpi:'A', jpa:'R', ays:'D',  fca:'X', gma2:'X'}
+  ],
+  June:[
+    {date:1, day:'MA',qpi:'X',  jpa:'R',  ays:'A',  fca:'X',   gma2:'D',  opmerking:''},
+    {date:2, day:'DI',qpi:'R',  jpa:'X',  ays:'A',  fca:'D*',  gma2:'KW', opmerking:''},
+    {date:3, day:'WO',qpi:'R',  jpa:'D*', ays:'X',  fca:'A',   gma2:'KW', opmerking:''},
+    {date:4, day:'DO',qpi:'X',  jpa:'D*', ays:'R',  fca:'A',   gma2:'KW', opmerking:''},
+    {date:5, day:'VR',qpi:'D*', jpa:'A',  ays:'R',  fca:'X',   gma2:'KW', opmerking:''},
+    {date:6, day:'ZA',qpi:'D',  jpa:'A',  ays:'X',  fca:'R',   gma2:'X',  opmerking:''},
+    {date:7, day:'ZO',qpi:'A',  jpa:'X',  ays:'D',  fca:'R',   gma2:'X',  opmerking:'X'},
+    {date:8, day:'MA',qpi:'A',  jpa:'R',  ays:'D*', fca:'X',   gma2:'KW', opmerking:''},
+    {date:9, day:'DI',qpi:'X',  jpa:'R',  ays:'A',  fca:'X',   gma2:'D',  opmerking:''},
+    {date:10,day:'WO',qpi:'R',  jpa:'X',  ays:'A',  fca:'D*',  gma2:'KW', opmerking:''},
+    {date:11,day:'DO',qpi:'R',  jpa:'X',  ays:'X',  fca:'A',   gma2:'D',  opmerking:''},
+    {date:12,day:'VR',qpi:'X',  jpa:'D*', ays:'R',  fca:'A',   gma2:'KW', opmerking:''},
+    {date:13,day:'ZA',qpi:'D',  jpa:'A',  ays:'R',  fca:'X',   gma2:'X',  opmerking:''},
+    {date:14,day:'ZO',qpi:'D',  jpa:'A',  ays:'X',  fca:'R',   gma2:'X',  opmerking:''},
+    {date:15,day:'MA',qpi:'A',  jpa:'X',  ays:'D*', fca:'R',   gma2:'KW', opmerking:''},
+    {date:16,day:'DI',qpi:'A',  jpa:'R',  ays:'D*', fca:'X',   gma2:'KW', opmerking:''},
+    {date:17,day:'WO',qpi:'X',  jpa:'R',  ays:'A',  fca:'X',   gma2:'D',  opmerking:''},
+    {date:18,day:'DO',qpi:'R',  jpa:'X',  ays:'A',  fca:'D*',  gma2:'KW', opmerking:''},
+    {date:19,day:'VR',qpi:'R',  jpa:'D*', ays:'X',  fca:'A',   gma2:'KW', opmerking:''},
+    {date:20,day:'ZA',qpi:'X',  jpa:'D',  ays:'R',  fca:'A',   gma2:'X',  opmerking:''},
+    {date:21,day:'ZO',qpi:'D',  jpa:'A',  ays:'R',  fca:'X',   gma2:'X',  opmerking:''},
+    {date:22,day:'MA',qpi:'D*', jpa:'A',  ays:'X',  fca:'R',   gma2:'KW', opmerking:''},
+    {date:23,day:'DI',qpi:'A',  jpa:'X',  ays:'D*', fca:'R',   gma2:'KW', opmerking:''},
+    {date:24,day:'WO',qpi:'A',  jpa:'R',  ays:'D*', fca:'X',   gma2:'KW', opmerking:''},
+    {date:25,day:'DO',qpi:'X',  jpa:'R',  ays:'A',  fca:'D*',  gma2:'KW', opmerking:''},
+    {date:26,day:'VR',qpi:'R',  jpa:'X',  ays:'A',  fca:'D*',  gma2:'KW', opmerking:''},
+    {date:27,day:'ZA',qpi:'R',  jpa:'X',  ays:'X',  fca:'A',   gma2:'D',  opmerking:''},
+    {date:28,day:'ZO',qpi:'X',  jpa:'D',  ays:'R',  fca:'A',   gma2:'X',  opmerking:''},
+    {date:29,day:'MA',qpi:'VAK',jpa:'A',  ays:'R',  fca:'X',   gma2:'D',  opmerking:''},
+    {date:30,day:'DI',qpi:'VAK',jpa:'A',  ays:'X',  fca:'R=D*',gma2:'KW', opmerking:''}
+  ]
 };
 
-function createEmptyMonth(days){
+// ═══════════════════════════════════════════════
+//  STORE
+// ═══════════════════════════════════════════════
+const store = {};
+MONTHS.forEach((m,i)=>{
+  const key = 'r26_'+m;
+  let d = null;
+  try { const s=localStorage.getItem(key); if(s) d=JSON.parse(s); } catch(e){}
+  store[m] = d || (PRESET[m] ? PRESET[m].map(r=>({...r})) : emptyMonth(i));
+});
 
-  const weekdays = ["MA","DI","WO","DO","VR","ZA","ZO"];
+function save(m){ try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){ toast('⚠️ Opslaan mislukt'); } }
 
-  const arr = [];
-
-  for(let i=1;i<=days;i++){
-
-    arr.push([
-      weekdays[(i-1)%7],
-      i,
-      "",
-      "0",
-      "",
-      "0",
-      "0",
-      ""
-    ]);
-
-  }
-
-  return arr;
-
+function emptyMonth(idx){
+  return Array.from({length:MDAYS[idx]},(_,i)=>({
+    date:i+1, day:DNAMES[i%7], qpi:'', jpa:'', ays:'', fca:'', gma2:'', opmerking:''
+  }));
 }
 
-monthData["April"] = createEmptyMonth(30);
-monthData["July"] = createEmptyMonth(31);
-monthData["August"] = createEmptyMonth(31);
-monthData["September"] = createEmptyMonth(30);
-monthData["October"] = createEmptyMonth(31);
-monthData["November"] = createEmptyMonth(30);
-monthData["December"] = createEmptyMonth(31);
-
-const tbody = document.querySelector("#roosterTable tbody");
-
-function getHours(v){
-
-  v = (v || "").toUpperCase().trim();
-
-  if(v.includes("D*")) return 8;
-  if(v.includes("KW")) return 4;
-  if(v.includes("D")) return 12;
-  if(v === "A") return 12;
-
+// ═══════════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════════
+function hrs(v){
+  if(!v) return 0;
+  const s=v.toUpperCase();
+  if(s.includes('D*')) return 8;
+  if(s==='D')  return 12;
+  if(s==='A')  return 12;
+  if(s.includes('KW')) return 4;
   return 0;
-
 }
 
-function applyClass(td,val){
-
-  td.classList.remove("kw","d","x","dstar");
-
-  const v = val.toUpperCase();
-
-  if(v.includes("D*")){
-    td.classList.add("dstar");
-  }
-  else if(v.includes("KW")){
-    td.classList.add("kw");
-  }
-  else if(v.includes("X")){
-    td.classList.add("x");
-  }
-  else if(v.includes("D") || v==="A"){
-    td.classList.add("d");
-  }
-
+function shiftClass(v){
+  if(!v) return '';
+  const s=v.toUpperCase();
+  if(s.includes('D*'))         return 'sds';
+  if(s==='D')                  return 'sd';
+  if(s==='A')                  return 'sa';
+  if(s.includes('KW'))         return 'sk';
+  if(s==='X')                  return 'sx';
+  if(s==='R'||s.startsWith('R=')) return 'sr';
+  if(s==='VAK')                return 'sv';
+  return '';
 }
 
-function renderTabs(){
+function applyColor(td,val){
+  td.classList.remove('sk','sd','sds','sa','sx','sr','sv');
+  const c=shiftClass(val);
+  if(c) td.classList.add(c);
+}
 
-  const tabs = document.getElementById("tabs");
+function calcTotals(m){
+  const t={qpi:0,jpa:0,ays:0,fca:0,gma2:0};
+  store[m].forEach(r=>COLS.forEach(c=>{ t[c]+=hrs(r[c]); }));
+  return t;
+}
 
-  tabs.innerHTML = "";
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'), 2200);
+}
 
-  months.forEach(month=>{
+// ═══════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════
+let current='May';
 
-    const btn = document.createElement("button");
+function buildTabs(){
+  const el=document.getElementById('tabs');
+  MONTHS.forEach(m=>{
+    const b=document.createElement('button');
+    b.className='tab-btn'+(m===current?' active':'');
+    b.textContent=m;
+    b.onclick=()=>{ current=m; renderAll(); };
+    el.appendChild(b);
+  });
+}
 
-    btn.className = "tab-btn";
+function setActiveTab(){
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent===current);
+  });
+}
 
-    if(month === currentMonth){
-      btn.classList.add("active");
+// ═══════════════════════════════════════════════
+//  UPLOAD  (fixed)
+// ═══════════════════════════════════════════════
+function processImageFile(file, monthKey){
+  if(!file || !file.type.startsWith('image/')){
+    toast('⚠️ Selecteer een afbeeldingsbestand.');
+    return;
+  }
+  // Warn if very large (localStorage typically ~5-10MB total)
+  if(file.size > 4*1024*1024){
+    toast('⚠️ Afbeelding te groot (max 4MB). Probeer een kleinere foto.');
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    try{
+      localStorage.setItem('img_'+monthKey, ev.target.result);
+      toast('✅ Foto opgeslagen!');
+      renderAll();
+    } catch(err){
+      // localStorage quota exceeded — compress by re-drawing smaller
+      toast('⚠️ Opslag vol. Probeer een kleinere foto.');
     }
+  };
+  reader.onerror=()=>toast('⚠️ Lezen mislukt. Probeer opnieuw.');
+  reader.readAsDataURL(file);
+}
 
-    btn.textContent = month;
+function buildUploadZone(monthKey){
+  const savedImg=localStorage.getItem('img_'+monthKey);
 
-    btn.onclick = ()=>{
-
-      currentMonth = month;
-
-      renderTabs();
-      renderMonth();
-      loadImage();
-
+  if(savedImg){
+    // Show image with remove button
+    const wrap=document.createElement('div');
+    wrap.className='img-wrap';
+    const img=document.createElement('img');
+    img.src=savedImg;
+    img.alt='Rooster foto';
+    const rm=document.createElement('button');
+    rm.className='img-remove';
+    rm.textContent='✕ Verwijder foto';
+    rm.onclick=()=>{
+      localStorage.removeItem('img_'+monthKey);
+      toast('🗑️ Foto verwijderd');
+      renderAll();
     };
+    wrap.appendChild(img);
+    wrap.appendChild(rm);
+    return wrap;
+  }
 
-    tabs.appendChild(btn);
+  // Build upload zone — NO onclick on the div to avoid double-trigger
+  const zone=document.createElement('div');
+  zone.className='upload-zone';
+  zone.innerHTML=`<div class="up-icon">📸</div>
+                  <p>Upload Rooster Foto</p>
+                  <span>Klik hier of sleep een afbeelding</span>`;
 
+  // Hidden file input — positioned inside zone via CSS (inset:0, opacity:0)
+  const inp=document.createElement('input');
+  inp.type='file';
+  inp.accept='image/*';
+  inp.style.cssText='position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;';
+  inp.addEventListener('change', e=>{
+    const file=e.target.files[0];
+    if(file) processImageFile(file, monthKey);
+    inp.value=''; // reset so same file can be re-selected
   });
 
+  // Drag & drop — proper independent handler (no proxy)
+  zone.addEventListener('dragover', e=>{ e.preventDefault(); e.stopPropagation(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', e=>{ e.stopPropagation(); zone.classList.remove('drag-over'); });
+  zone.addEventListener('drop', e=>{
+    e.preventDefault(); e.stopPropagation();
+    zone.classList.remove('drag-over');
+    const file=e.dataTransfer.files[0];
+    if(file) processImageFile(file, monthKey);
+  });
+
+  zone.appendChild(inp);
+  return zone;
 }
 
-function renderMonth(){
+// ═══════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════
+function renderAll(){
+  setActiveTab();
+  const m    = current;
+  const data = store[m];
+  const t    = calcTotals(m);
+  const card = document.getElementById('card');
+  card.innerHTML='';
 
-  document.getElementById("monthTitle").textContent =
-    currentMonth + " 2026";
+  // Month heading
+  const mh=document.createElement('div');
+  mh.className='month-heading';
+  mh.textContent=`${m.toUpperCase()} 2026`;
+  card.appendChild(mh);
 
-  tbody.innerHTML = "";
+  // Stats
+  const sr=document.createElement('div');
+  sr.className='stats-row';
+  COLS.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='stat'+(c==='gma2'?' gma-stat':'');
+    d.innerHTML=`<div class="stat-name">${c.toUpperCase()}</div>
+                 <div class="stat-hrs" id="sh_${c}">${t[c]}</div>
+                 <div class="stat-lbl">uren</div>`;
+    sr.appendChild(d);
+  });
+  card.appendChild(sr);
 
-  const data = monthData[currentMonth];
+  // Legend
+  const leg=document.createElement('div');
+  leg.className='legend';
+  leg.innerHTML=`
+    <div class="leg"><div class="leg-box sd">D</div><span>D = 12u</span></div>
+    <div class="leg"><div class="leg-box sds">D*</div><span>D* = 8u</span></div>
+    <div class="leg"><div class="leg-box sa">A</div><span>A = 12u</span></div>
+    <div class="leg"><div class="leg-box sk">KW</div><span>KW = 4u</span></div>
+    <div class="leg"><div class="leg-box sx">X</div><span>X = Vrij</span></div>
+    <div class="leg"><div class="leg-box sr">R</div><span>R = Rust</span></div>
+    <div class="leg"><div class="leg-box sv">VAK</div><span>VAK = Vakantie</span></div>`;
+  card.appendChild(leg);
 
-  data.forEach((row,rowIndex)=>{
+  // Upload zone
+  card.appendChild(buildUploadZone(m));
 
-    const tr = document.createElement("tr");
+  // Table
+  const wrap=document.createElement('div');
+  wrap.className='tbl-wrap';
+  const tbl=document.createElement('table');
 
-    row.forEach((cell,colIndex)=>{
+  // thead
+  const thead=document.createElement('thead');
+  const htr=document.createElement('tr');
+  ['DAT','DAG','QPI','JPA','AYS','FCA','GMA2','OPMERKING'].forEach(h=>{
+    const th=document.createElement('th');
+    th.textContent=h;
+    if(h==='GMA2') th.className='gma-th';
+    htr.appendChild(th);
+  });
+  thead.appendChild(htr);
+  tbl.appendChild(thead);
 
-      const td = document.createElement("td");
+  // tbody
+  const tbody=document.createElement('tbody');
+  data.forEach(row=>{
+    const tr=document.createElement('tr');
 
-      td.textContent = cell;
+    const td1=document.createElement('td'); td1.className='lbl'; td1.textContent=row.date; tr.appendChild(td1);
+    const td2=document.createElement('td'); td2.className='lbl'; td2.textContent=row.day;  tr.appendChild(td2);
 
-      if(colIndex === 2 || colIndex === 4 || colIndex === 7){
-
-        td.contentEditable = true;
-
-        td.addEventListener("paste",(e)=>{
-          e.preventDefault();
-          const text = e.clipboardData.getData("text/plain");
-          document.execCommand("insertText",false,text);
-        });
-
-      }
-
-      if(colIndex === 2 || colIndex === 4){
-        applyClass(td,cell);
-      }
-
-      td.onblur = ()=>{
-
-        monthData[currentMonth][rowIndex][colIndex] =
-          td.textContent.trim().toUpperCase();
-
-        if(colIndex === 2){
-
-          const val = monthData[currentMonth][rowIndex][2];
-
-          monthData[currentMonth][rowIndex][3] =
-            getHours(val);
-
-        }
-
-        if(colIndex === 4){
-
-          const val = monthData[currentMonth][rowIndex][4];
-
-          monthData[currentMonth][rowIndex][5] =
-            getHours(val);
-
-        }
-
-        const total =
-          Number(monthData[currentMonth][rowIndex][3]) +
-          Number(monthData[currentMonth][rowIndex][5]);
-
-        monthData[currentMonth][rowIndex][6] = total;
-
-        renderMonth();
-        calculateTotals();
-
-      };
-
+    COLS.forEach(c=>{
+      const td=document.createElement('td');
+      td.contentEditable=true;
+      td.textContent=row[c]||'';
+      if(c==='gma2') td.classList.add('gma-col');
+      applyColor(td, row[c]);
+      td.addEventListener('focus',()=>{ td.dataset.prev=td.textContent; });
+      td.addEventListener('blur',()=>{
+        const val=td.textContent.trim().toUpperCase();
+        td.textContent=val;
+        row[c]=val;
+        applyColor(td,val);
+        refreshStats(m);
+        save(m);
+      });
+      td.addEventListener('keydown',e=>{
+        if(e.key==='Enter'){ e.preventDefault(); td.blur(); }
+        if(e.key==='Escape'){ td.textContent=td.dataset.prev||''; td.blur(); }
+      });
       tr.appendChild(td);
-
     });
 
+    // Opmerking
+    const tdOp=document.createElement('td');
+    tdOp.contentEditable=true;
+    tdOp.className='op-col';
+    tdOp.textContent=row.opmerking||'';
+    tdOp.addEventListener('blur',()=>{ row.opmerking=tdOp.textContent.trim(); save(m); });
+    tdOp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); tdOp.blur(); } });
+    tr.appendChild(tdOp);
+
     tbody.appendChild(tr);
-
   });
+  tbl.appendChild(tbody);
 
-  calculateTotals();
-
-}
-
-function calculateTotals(){
-
-  let jpa = 0;
-  let gma = 0;
-
-  monthData[currentMonth].forEach(r=>{
-
-    jpa += Number(r[3]);
-    gma += Number(r[5]);
-
+  // tfoot
+  const tfoot=document.createElement('tfoot');
+  const ftr=document.createElement('tr');
+  const ftd1=document.createElement('td'); ftd1.textContent='TOTAAL'; ftr.appendChild(ftd1);
+  const ftd2=document.createElement('td'); ftr.appendChild(ftd2);
+  COLS.forEach(c=>{
+    const td=document.createElement('td');
+    td.id='ft_'+c; td.textContent=t[c];
+    if(c==='gma2') td.classList.add('gma-col');
+    ftr.appendChild(td);
   });
+  const ftdOp=document.createElement('td'); ftr.appendChild(ftdOp);
+  tfoot.appendChild(ftr);
+  tbl.appendChild(tfoot);
 
-  document.getElementById("jpaTotal").textContent = jpa;
-  document.getElementById("gmaTotal").textContent = gma;
-  document.getElementById("grandTotal").textContent = jpa + gma;
+  wrap.appendChild(tbl);
+  card.appendChild(wrap);
 
+  // Actions
+  const act=document.createElement('div');
+  act.className='actions';
+  act.innerHTML=`
+    <button class="btn btn-blue"  onclick="exportXlsx()">📥 Export Excel</button>
+    <button class="btn btn-ghost" onclick="clearMonth()">🗑️ Wis maand</button>`;
+  card.appendChild(act);
 }
 
-function saveCurrentMonth(){
-
-  localStorage.setItem(
-    "rooster_" + currentMonth,
-    JSON.stringify(monthData[currentMonth])
-  );
-
-  alert(currentMonth + " saved.");
-
-}
-
-function loadSavedMonths(){
-
-  months.forEach(month=>{
-
-    const saved = localStorage.getItem("rooster_" + month);
-
-    if(saved){
-
-      monthData[month] = JSON.parse(saved);
-
-    }
-
+function refreshStats(m){
+  const t=calcTotals(m);
+  COLS.forEach(c=>{
+    const sh=document.getElementById('sh_'+c);
+    const ft=document.getElementById('ft_'+c);
+    if(sh) sh.textContent=t[c];
+    if(ft) ft.textContent=t[c];
   });
-
 }
 
-function exportCSV(){
-
-  let csv = "DAG,DAT,JPA,U,GMA,U,TOTAAL,OPMERKING\n";
-
-  monthData[currentMonth].forEach(r=>{
-
-    csv += r.join(",") + "\n";
-
-  });
-
-  const blob = new Blob([csv],{type:"text/csv"});
-
-  const a = document.createElement("a");
-
-  a.href = URL.createObjectURL(blob);
-
-  a.download = currentMonth + "_2026.csv";
-
-  a.click();
-
+// ═══════════════════════════════════════════════
+//  ACTIONS
+// ═══════════════════════════════════════════════
+function exportXlsx(){
+  const m=current;
+  const rows=store[m].map(r=>[r.date,r.day,r.qpi,r.jpa,r.ays,r.fca,r.gma2,r.opmerking||'']);
+  const t=calcTotals(m);
+  rows.push(['TOTAAL','',t.qpi,t.jpa,t.ays,t.fca,t.gma2,'']);
+  const ws=XLSX.utils.aoa_to_sheet([['DAT','DAG','QPI','JPA','AYS','FCA','GMA2','OPMERKING'],...rows]);
+  ws['!cols']=[{wch:5},{wch:5},{wch:8},{wch:8},{wch:8},{wch:8},{wch:8},{wch:20}];
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,m);
+  XLSX.writeFile(wb,`Rooster_${m}_2026.xlsx`);
+  toast('✅ Excel geëxporteerd!');
 }
 
-function resetMonth(){
-
-  if(confirm("Reset " + currentMonth + "?")){
-
-    localStorage.removeItem("rooster_" + currentMonth);
-
-    location.reload();
-
-  }
-
+function clearMonth(){
+  if(!confirm(`Alle data voor ${current} wissen?`)) return;
+  store[current]=emptyMonth(MONTHS.indexOf(current));
+  save(current);
+  toast('🗑️ Maand gewist');
+  renderAll();
 }
 
-const uploadBox = document.getElementById("uploadBox");
-const fileInput = document.getElementById("fileInput");
-const preview = document.getElementById("preview");
-
-uploadBox.addEventListener("dragover",(e)=>{
-
-  e.preventDefault();
-
-  uploadBox.classList.add("dragging");
-
-});
-
-uploadBox.addEventListener("dragleave",()=>{
-
-  uploadBox.classList.remove("dragging");
-
-});
-
-uploadBox.addEventListener("drop",(e)=>{
-
-  e.preventDefault();
-
-  uploadBox.classList.remove("dragging");
-
-  const file = e.dataTransfer.files[0];
-
-  if(file){
-
-    fileInput.files = e.dataTransfer.files;
-
-    showImage(file);
-
-  }
-
-});
-
-fileInput.addEventListener("change",(e)=>{
-
-  const file = e.target.files[0];
-
-  if(file){
-    showImage(file);
-  }
-
-});
-
-function showImage(file){
-
-  const reader = new FileReader();
-
-  reader.onload = (e)=>{
-
-    preview.src = e.target.result;
-
-    preview.style.display = "block";
-
-    localStorage.setItem(
-      "image_" + currentMonth,
-      e.target.result
-    );
-
-  };
-
-  reader.readAsDataURL(file);
-
-}
-
-function loadImage(){
-
-  const img = localStorage.getItem(
-    "image_" + currentMonth
-  );
-
-  if(img){
-
-    preview.src = img;
-
-    preview.style.display = "block";
-
-  }else{
-
-    preview.style.display = "none";
-
-  }
-
-}
-
-loadSavedMonths();
-renderTabs();
-renderMonth();
-loadImage();
-
+// ═══════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════
+buildTabs();
+renderAll();
 </script>
-
 </body>
 </html>
