@@ -117,6 +117,8 @@ body {
   transition:all 0.25s; margin-bottom:14px;
   background:rgba(59,130,246,0.04);
   user-select:none;
+  position:relative;   /* REQUIRED: contains the absolute input */
+  overflow:hidden;
 }
 .upload-zone:hover, .upload-zone.drag-over {
   border-color:var(--acl); background:rgba(59,130,246,0.1);
@@ -327,6 +329,12 @@ const PRESET = {
 const store = {};
 MONTHS.forEach((m,i)=>{
   const key = 'r26_'+m;
+  // Always reload May and June from preset (in case data was updated)
+  if(m==='June' || m==='May'){
+    store[m] = PRESET[m].map(r=>({...r}));
+    localStorage.setItem(key, JSON.stringify(store[m]));
+    return;
+  }
   let d = null;
   try { const s=localStorage.getItem(key); if(s) d=JSON.parse(s); } catch(e){}
   store[m] = d || (PRESET[m] ? PRESET[m].map(r=>({...r})) : emptyMonth(i));
@@ -409,28 +417,35 @@ function setActiveTab(){
 }
 
 // ═══════════════════════════════════════════════
-//  UPLOAD  (fixed)
+//  UPLOAD  (fixed + image compression)
 // ═══════════════════════════════════════════════
 function processImageFile(file, monthKey){
   if(!file || !file.type.startsWith('image/')){
-    toast('⚠️ Selecteer een afbeeldingsbestand.');
-    return;
+    toast('⚠️ Selecteer een afbeeldingsbestand.'); return;
   }
-  // Warn if very large (localStorage typically ~5-10MB total)
-  if(file.size > 4*1024*1024){
-    toast('⚠️ Afbeelding te groot (max 4MB). Probeer een kleinere foto.');
-    return;
-  }
+  toast('⏳ Foto verwerken...');
   const reader=new FileReader();
   reader.onload=ev=>{
-    try{
-      localStorage.setItem('img_'+monthKey, ev.target.result);
-      toast('✅ Foto opgeslagen!');
-      renderAll();
-    } catch(err){
-      // localStorage quota exceeded — compress by re-drawing smaller
-      toast('⚠️ Opslag vol. Probeer een kleinere foto.');
-    }
+    const img=new Image();
+    img.onload=()=>{
+      // Compress: max 1200px wide, quality 0.75
+      const MAX=1200;
+      let w=img.width, h=img.height;
+      if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
+      const canvas=document.createElement('canvas');
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      const compressed=canvas.toDataURL('image/jpeg',0.75);
+      try{
+        localStorage.setItem('img_'+monthKey, compressed);
+        toast('✅ Foto opgeslagen!');
+        renderAll();
+      } catch(err){
+        toast('⚠️ Opslag vol. Wis een andere foto eerst.');
+      }
+    };
+    img.onerror=()=>toast('⚠️ Afbeelding kon niet geladen worden.');
+    img.src=ev.target.result;
   };
   reader.onerror=()=>toast('⚠️ Lezen mislukt. Probeer opnieuw.');
   reader.readAsDataURL(file);
