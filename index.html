@@ -875,69 +875,85 @@ function setFilter(f){
 //  AI UPLOAD — show image first, then extract
 // ══════════════════════════════════════════
 async function extractRoosterWithAI(b64, m){
-  // Show spinner in upload area while working
   const status = document.getElementById('ai-status');
-  if(status) status.textContent = '🤖 AI leest het rooster... even geduld';
+  const setStatus = (msg) => { if(status) status.textContent = msg; };
 
-  const prompt = `This is a Dutch work schedule (rooster) image for one month.
-Extract EVERY row. Return ONLY a raw JSON array, no markdown, no explanation, no backticks:
-[{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},{"date":2,"day":"DI","jpa":"X","gma2":"A","op":"Feestdag"}]
+  setStatus('🤖 AI leest het rooster... even geduld');
 
-Rules:
-- date = the DAT column number (integer)
-- day = DAG column abbreviation: MA DI WO DO VR ZA ZO
-- jpa = JPA column value exactly as printed
-- gma2 = GMA2 column value exactly as printed
-- op = OPMERKING text if present, else empty string ""
-- Valid shift codes: X D D* A KW R R=A R=D VAK VG S
-- For unclear handwriting use your best guess
-- Include ALL rows for every day of the month`;
+  const prompt = `This is a Dutch observatory work schedule (rooster) image.
+Read every single row carefully. Return ONLY a raw JSON array - no markdown fences, no explanation, just the array starting with [ and ending with ].
+
+Format: [{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},{"date":2,"day":"DI","jpa":"X","gma2":"A","op":"Feestdag"}]
+
+Column mapping:
+- date = DAT column (number)
+- day = DAG column (MA/DI/WO/DO/VR/ZA/ZO)
+- jpa = JPA column value
+- gma2 = GMA2 column value  
+- op = OPMERKING column text, or "" if empty
+
+Shift codes to use: X, D, D*, A, KW, R, R=A, R=D, R=KW, VAK, VG, S
+For handwritten corrections, read the final value written.
+Return ALL rows for every day shown.`;
 
   try {
+    setStatus('🤖 Verbinding maken met AI...');
+
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
-        messages: [{ role: 'user', content: [
-          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
-          { type: 'text', text: prompt }
-        ]}]
+        model: 'claude-opus-4-5',
+        max_tokens: 3000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
       })
     });
 
-    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
-    const data = await resp.json();
-    const raw  = (data.content||[]).map(c=>c.text||'').join('');
-    const clean = raw.replace(/```json|```/gi,'').trim();
-
-    let rows;
-    try { rows = JSON.parse(clean); } catch(e) {
-      // Try extracting JSON array from the text
-      const match = clean.match(/\[[\s\S]*\]/);
-      if(match) rows = JSON.parse(match[0]);
-      else throw new Error('No JSON array found');
+    if(!resp.ok) {
+      const errText = await resp.text();
+      throw new Error(`HTTP ${resp.status}: ${errText}`);
     }
 
-    if(!Array.isArray(rows)||rows.length===0) throw new Error('Empty array');
+    const data = await resp.json();
+    const raw = (data.content || []).map(c => c.text || '').join('').trim();
 
-    store[m] = rows.map(r=>({
-      date: parseInt(r.date) || r.date,
-      day:  (r.day  ||'').toUpperCase().trim(),
-      jpa:  (r.jpa  ||'').toUpperCase().trim(),
-      gma2: (r.gma2 ||'').toUpperCase().trim(),
-      op:   (r.op   ||'').trim()
+    // Extract JSON array robustly
+    let rows;
+    const cleaned = raw.replace(/```json|```/gi, '').trim();
+    const arrayMatch = cleaned.match(/\[[\s\S]*\]/);
+    if(!arrayMatch) throw new Error('Geen JSON array gevonden in antwoord');
+    rows = JSON.parse(arrayMatch[0]);
+
+    if(!Array.isArray(rows) || rows.length === 0) throw new Error('Lege array');
+
+    // Write to store
+    store[m] = rows.map(r => ({
+      date: parseInt(r.date) || 0,
+      day:  (r.day  || '').toUpperCase().trim(),
+      jpa:  (r.jpa  || '').toUpperCase().trim(),
+      gma2: (r.gma2 || '').toUpperCase().trim(),
+      op:   (r.op   || '').trim()
     }));
 
-    try { localStorage.setItem('r26_'+m, JSON.stringify(store[m])); } catch(e){}
+    // Persist
+    try { localStorage.setItem('r26_' + m, JSON.stringify(store[m])); } catch(e) {}
 
-    if(status) status.textContent = `✅ ${rows.length} rijen ingelezen! Shifts zijn nu interactief.`;
-    setTimeout(()=>render(), 800);
+    setStatus(`✅ ${rows.length} rijen ingelezen voor ${m}! Shifts zijn nu interactief — klik een badge om te wijzigen.`);
+    setTimeout(() => render(), 900);
 
   } catch(err) {
     console.error('AI extract error:', err);
-    if(status) status.textContent = '⚠️ AI kon het rooster niet lezen. Controleer de foto en probeer opnieuw.';
+    setStatus(`⚠️ Fout: ${err.message}. Probeer een scherpere foto of probeer opnieuw.`);
   }
 }
 
@@ -945,43 +961,49 @@ function processImageFile(file, m){
   if(!file || !file.type.startsWith('image/')){ toast('⚠️ Selecteer een afbeelding.'); return; }
 
   const reader = new FileReader();
-  reader.onerror = ()=> toast('⚠️ Kon bestand niet lezen.');
+  reader.onerror = () => toast('⚠️ Kon bestand niet lezen.');
   reader.onload = ev => {
     const originalSrc = ev.target.result;
 
-    // ── Step 1: show the image immediately, raw ──
+    // ── Step 1: show image immediately ──
     const wrap = document.getElementById('uploadWrap');
     wrap.innerHTML = `
       <div class="img-wrap" id="preview-wrap">
-        <img src="${originalSrc}" alt="Rooster foto" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;margin-bottom:10px">
+        <img src="${originalSrc}" alt="Rooster foto"
+             style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;margin-bottom:10px">
         <button class="img-remove" onclick="removeUpload('${m}')">✕ Verwijder foto</button>
       </div>
-      <div id="ai-status" style="text-align:center;padding:12px;font-size:12px;font-weight:600;color:var(--acl);background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">
-        ⏳ Foto comprimeren voor AI...
+      <div id="ai-status" style="text-align:center;padding:14px;font-size:12px;font-weight:600;
+           color:var(--acl);background:var(--card);border:1px solid var(--accent);
+           border-radius:8px;margin-bottom:10px;line-height:1.6">
+        ⏳ Afbeelding laden...
       </div>`;
 
-    // ── Step 2: compress, save, send to AI ──
+    // ── Step 2: compress & send to AI ──
     const img = new Image();
     img.onload = () => {
-      const MAX = 1400;
+      const status = document.getElementById('ai-status');
+      if(status) status.textContent = '⏳ Comprimeren voor AI...';
+
+      // Max 1600px wide — higher res = better OCR accuracy
+      const MAX = 1600;
       let w = img.width, h = img.height;
       if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.85);
+      const compressed = canvas.toDataURL('image/jpeg', 0.90); // high quality for OCR
 
-      // Persist compressed preview
-      try { localStorage.setItem('img_'+m, compressed); } catch(e) {
-        // If quota full, use original display but still try AI
-      }
+      // Save preview to localStorage
+      try { localStorage.setItem('img_' + m, compressed); } catch(e) {}
 
       const b64 = compressed.split(',')[1];
       extractRoosterWithAI(b64, m);
     };
     img.onerror = () => {
       const status = document.getElementById('ai-status');
-      if(status) status.textContent = '⚠️ Afbeelding laden mislukt.';
+      if(status) status.textContent = '⚠️ Afbeelding kon niet geladen worden.';
     };
     img.src = originalSrc;
   };
