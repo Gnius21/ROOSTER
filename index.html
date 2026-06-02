@@ -227,6 +227,9 @@ td[contenteditable=true]:focus { outline: 2px solid var(--accent); outline-offse
 .btn-ghost { background: var(--card); color: var(--ts); border: 1px solid var(--border); }
 .btn-ghost:hover { border-color: var(--accent); color: var(--acl); }
 
+.person-card details summary::-webkit-details-marker { display:none; }
+.person-card details[open] summary .person-card-name::after { content:''; }
+
 /* ── TODAY HIGHLIGHT ── */
 tbody tr.today {
   background: rgba(232,105,42,0.12) !important;
@@ -340,6 +343,71 @@ const DNAMES = ['MA','DI','WO','DO','VR','ZA','ZO'];
 //  PRESET DATA
 // ══════════════════════════════════════════
 const PRESET = {
+
+  January:[
+    {date:1, day:'DO',jpa:'X',   gma2:'KW',  op:'NIEUWJAAR'},
+    {date:2, day:'VR',jpa:'D*',  gma2:'KW',  op:''},
+    {date:3, day:'ZA',jpa:'D',   gma2:'X',   op:''},
+    {date:4, day:'ZO',jpa:'A',   gma2:'X',   op:''},
+    {date:5, day:'MA',jpa:'A',   gma2:'D',   op:''},
+    {date:6, day:'DI',jpa:'X',   gma2:'KW',  op:''},
+    {date:7, day:'WO',jpa:'R',   gma2:'KW',  op:''},
+    {date:8, day:'DO',jpa:'R',   gma2:'D',   op:''},
+    {date:9, day:'VR',jpa:'X',   gma2:'KW',  op:''},
+    {date:10,day:'ZA',jpa:'D',   gma2:'X',   op:''},
+    {date:11,day:'ZO',jpa:'D',   gma2:'X',   op:''},
+    {date:12,day:'MA',jpa:'A',   gma2:'D',   op:''},
+    {date:13,day:'DI',jpa:'A',   gma2:'KW',  op:''},
+    {date:14,day:'WO',jpa:'X',   gma2:'KW',  op:''},
+    {date:15,day:'DO',jpa:'R',   gma2:'KW',  op:''},
+    {date:16,day:'VR',jpa:'R',   gma2:'D',   op:''},
+    {date:17,day:'ZA',jpa:'X',   gma2:'X',   op:''},
+    {date:18,day:'ZO',jpa:'D',   gma2:'X',   op:''},
+    {date:19,day:'MA',jpa:'X',   gma2:'D',   op:''},
+    {date:20,day:'DI',jpa:'A',   gma2:'KW',  op:''},
+    {date:21,day:'WO',jpa:'A',   gma2:'KW',  op:''},
+    {date:22,day:'DO',jpa:'X',   gma2:'KW',  op:''},
+    {date:23,day:'VR',jpa:'R',   gma2:'KW',  op:''},
+    {date:24,day:'ZA',jpa:'R',   gma2:'X',   op:''},
+    {date:25,day:'ZO',jpa:'X',   gma2:'X',   op:''},
+    {date:26,day:'MA',jpa:'X',   gma2:'D',   op:''},
+    {date:27,day:'DI',jpa:'D*',  gma2:'KW',  op:''},
+    {date:28,day:'WO',jpa:'A',   gma2:'KW',  op:''},
+    {date:29,day:'DO',jpa:'A',   gma2:'D',   op:''},
+    {date:30,day:'VR',jpa:'X',   gma2:'KW',  op:''},
+    {date:31,day:'ZA',jpa:'R=D', gma2:'X',   op:''},
+  ],
+
+  February:[
+    {date:1, day:'ZO',jpa:'R=A', gma2:'X',   op:''},
+    {date:2, day:'MA',jpa:'X',   gma2:'D',   op:''},
+    {date:3, day:'DI',jpa:'D*',  gma2:'KW',  op:''},
+    {date:4, day:'WO',jpa:'D*',  gma2:'KW',  op:''},
+    {date:5, day:'DO',jpa:'VG',  gma2:'KW',  op:''},
+    {date:6, day:'VR',jpa:'VG',  gma2:'KW',  op:''},
+    {date:7, day:'ZA',jpa:'X',   gma2:'X',   op:''},
+    {date:8, day:'ZO',jpa:'R=D', gma2:'X',   op:''},
+    {date:9, day:'MA',jpa:'R=A', gma2:'D',   op:''},
+    {date:10,day:'DI',jpa:'X',   gma2:'KW',  op:''},
+    {date:11,day:'WO',jpa:'D*',  gma2:'KW',  op:''},
+    {date:12,day:'DO',jpa:'D*',  gma2:'KW',  op:''},
+    {date:13,day:'VR',jpa:'A',   gma2:'D',   op:''},
+    {date:14,day:'ZA',jpa:'A',   gma2:'D',   op:''},
+    {date:15,day:'ZO',jpa:'X',   gma2:'X=D', op:''},
+    {date:16,day:'MA',jpa:'R',   gma2:'D',   op:"Karnaval's maandag"},
+    {date:17,day:'DI',jpa:'R=A', gma2:'KW',  op:''},
+    {date:18,day:'WO',jpa:'X',   gma2:'KW',  op:''},
+    {date:19,day:'DO',jpa:'D*',  gma2:'KW',  op:''},
+    {date:20,day:'VR',jpa:'D*',  gma2:'KW',  op:''},
+    {date:21,day:'ZA',jpa:'A',   gma2:'X',   op:''},
+    {date:22,day:'ZO',jpa:'A',   gma2:'X',   op:''},
+    {date:23,day:'MA',jpa:'X',   gma2:'D',   op:''},
+    {date:24,day:'DI',jpa:'R',   gma2:'KW',  op:''},
+    {date:25,day:'WO',jpa:'R=D', gma2:'D',   op:''},
+    {date:26,day:'DO',jpa:'X',   gma2:'D',   op:''},
+    {date:27,day:'VR',jpa:'D*',  gma2:'KW',  op:''},
+    {date:28,day:'ZA',jpa:'D',   gma2:'X',   op:''},
+  ],
 
   April:[
     {date:1, day:'WO',jpa:'VAK', gma2:'KW',  op:''},
@@ -635,18 +703,13 @@ const DATA2025 = {
 // ══════════════════════════════════════════
 const store = {};
 MONTHS.forEach((m,i)=>{
-  // Always reset April, May, June from preset
-  if(PRESET[m]){
-    store[m] = PRESET[m].map(r=>({...r}));
-    return;
-  }
+  // Try localStorage first (preserves user edits), fall back to preset, then empty
   let d=null;
   try{ const s=localStorage.getItem('r26_'+m); if(s) d=JSON.parse(s); }catch(e){}
-  store[m] = d || emptyMonth(i);
+  store[m] = d || (PRESET[m] ? PRESET[m].map(r=>({...r})) : emptyMonth(i));
 });
 
 function save(m){
-  if(PRESET[m]) return; // preset months don't need saving (they always reload)
   try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){ toast('⚠️ Opslaan mislukt'); }
 }
 
@@ -716,13 +779,19 @@ function makeBadge(val, editable, onChange){
 
 function calcTotals(m){
   let jpa=0, gma=0, jpadays=0, gmadays=0;
+  const jpaBreak={D:0,'D*':0,A:0,KW:0,R:0,'R=A':0,'R=D':0,VAK:0,X:0};
+  const gmaBreak={D:0,'D*':0,A:0,KW:0,R:0,'R=A':0,'R=D':0,VAK:0,X:0};
   store[m].forEach(r=>{
     const jh=hrs(r.jpa); const gh=hrs(r.gma2);
     jpa+=jh; gma+=gh;
     if(jh>0) jpadays++;
     if(gh>0) gmadays++;
+    // breakdown
+    const jk=r.jpa?.toUpperCase().trim()||''; const gk=r.gma2?.toUpperCase().trim()||'';
+    if(jk in jpaBreak) jpaBreak[jk]++; else if(jk) jpaBreak.R++;
+    if(gk in gmaBreak) gmaBreak[gk]++; else if(gk) gmaBreak.R++;
   });
-  return {jpa,gma,jpadays,gmadays};
+  return {jpa,gma,jpadays,gmadays,jpaBreak,gmaBreak};
 }
 
 // ══════════════════════════════════════════
@@ -769,106 +838,161 @@ function setFilter(f){
 }
 
 // ══════════════════════════════════════════
-//  AI UPLOAD — reads rooster photo via Claude
+//  AI UPLOAD — show image first, then extract
 // ══════════════════════════════════════════
 async function extractRoosterWithAI(b64, m){
-  toast('🤖 AI leest het rooster...');
-  const prompt=`This is a Dutch work schedule (rooster) image for one month.
-Extract EVERY row. Return ONLY raw JSON array, no markdown, no explanation:
-[{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},...]
+  // Show spinner in upload area while working
+  const status = document.getElementById('ai-status');
+  if(status) status.textContent = '🤖 AI leest het rooster... even geduld';
+
+  const prompt = `This is a Dutch work schedule (rooster) image for one month.
+Extract EVERY row. Return ONLY a raw JSON array, no markdown, no explanation, no backticks:
+[{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},{"date":2,"day":"DI","jpa":"X","gma2":"A","op":"Feestdag"}]
 
 Rules:
-- date = DAT column number
-- day = DAG column: MA DI WO DO VR ZA ZO
-- jpa = JPA column value exactly
-- gma2 = GMA2 column value exactly  
-- op = OPMERKING column text, empty string if blank
-- Valid codes: X D D* A KW R R=A R=D VAK VG S (use best guess for handwriting)
-- Include ALL days, return complete array`;
+- date = the DAT column number (integer)
+- day = DAG column abbreviation: MA DI WO DO VR ZA ZO
+- jpa = JPA column value exactly as printed
+- gma2 = GMA2 column value exactly as printed
+- op = OPMERKING text if present, else empty string ""
+- Valid shift codes: X D D* A KW R R=A R=D VAK VG S
+- For unclear handwriting use your best guess
+- Include ALL rows for every day of the month`;
 
-  try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:2000,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
-          {type:'text',text:prompt}
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: [
+          { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+          { type: 'text', text: prompt }
         ]}]
       })
     });
-    const data=await resp.json();
-    const text=data.content?.map(c=>c.text||'').join('');
-    const clean=text.replace(/```json|```/g,'').trim();
-    const rows=JSON.parse(clean);
-    if(!Array.isArray(rows)||rows.length===0) throw new Error('empty');
 
-    store[m]=rows.map(r=>({
-      date:  parseInt(r.date)||r.date,
-      day:   (r.day||'').toUpperCase(),
-      jpa:   (r.jpa||'').toUpperCase().trim(),
-      gma2:  (r.gma2||'').toUpperCase().trim(),
-      op:    r.op||''
+    if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    const raw  = (data.content||[]).map(c=>c.text||'').join('');
+    const clean = raw.replace(/```json|```/gi,'').trim();
+
+    let rows;
+    try { rows = JSON.parse(clean); } catch(e) {
+      // Try extracting JSON array from the text
+      const match = clean.match(/\[[\s\S]*\]/);
+      if(match) rows = JSON.parse(match[0]);
+      else throw new Error('No JSON array found');
+    }
+
+    if(!Array.isArray(rows)||rows.length===0) throw new Error('Empty array');
+
+    store[m] = rows.map(r=>({
+      date: parseInt(r.date) || r.date,
+      day:  (r.day  ||'').toUpperCase().trim(),
+      jpa:  (r.jpa  ||'').toUpperCase().trim(),
+      gma2: (r.gma2 ||'').toUpperCase().trim(),
+      op:   (r.op   ||'').trim()
     }));
-    try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){}
-    toast(`✅ ${rows.length} rijen ingelezen!`);
-    render();
-  }catch(err){
-    console.error(err);
-    toast('⚠️ AI kon het rooster niet lezen. Probeer een scherpere foto.');
+
+    try { localStorage.setItem('r26_'+m, JSON.stringify(store[m])); } catch(e){}
+
+    if(status) status.textContent = `✅ ${rows.length} rijen ingelezen! Shifts zijn nu interactief.`;
+    setTimeout(()=>render(), 800);
+
+  } catch(err) {
+    console.error('AI extract error:', err);
+    if(status) status.textContent = '⚠️ AI kon het rooster niet lezen. Controleer de foto en probeer opnieuw.';
   }
 }
 
 function processImageFile(file, m){
-  if(!file||!file.type.startsWith('image/')){ toast('⚠️ Selecteer een afbeelding.'); return; }
-  toast('⏳ Foto verwerken...');
-  const reader=new FileReader();
-  reader.onload=ev=>{
-    const img=new Image();
-    img.onload=()=>{
-      // Compress to max 1400px for best OCR quality
-      const MAX=1400; let w=img.width,h=img.height;
-      if(w>MAX){ h=Math.round(h*MAX/w); w=MAX; }
-      const canvas=document.createElement('canvas');
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      const compressed=canvas.toDataURL('image/jpeg',0.88);
-      // Save preview
-      try{ localStorage.setItem('img_'+m, compressed); }catch(e){}
-      // Extract base64 only
-      const b64=compressed.split(',')[1];
+  if(!file || !file.type.startsWith('image/')){ toast('⚠️ Selecteer een afbeelding.'); return; }
+
+  const reader = new FileReader();
+  reader.onerror = ()=> toast('⚠️ Kon bestand niet lezen.');
+  reader.onload = ev => {
+    const originalSrc = ev.target.result;
+
+    // ── Step 1: show the image immediately, raw ──
+    const wrap = document.getElementById('uploadWrap');
+    wrap.innerHTML = `
+      <div class="img-wrap" id="preview-wrap">
+        <img src="${originalSrc}" alt="Rooster foto" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block;margin-bottom:10px">
+        <button class="img-remove" onclick="removeUpload('${m}')">✕ Verwijder foto</button>
+      </div>
+      <div id="ai-status" style="text-align:center;padding:12px;font-size:12px;font-weight:600;color:var(--acl);background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:10px">
+        ⏳ Foto comprimeren voor AI...
+      </div>`;
+
+    // ── Step 2: compress, save, send to AI ──
+    const img = new Image();
+    img.onload = () => {
+      const MAX = 1400;
+      let w = img.width, h = img.height;
+      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const compressed = canvas.toDataURL('image/jpeg', 0.85);
+
+      // Persist compressed preview
+      try { localStorage.setItem('img_'+m, compressed); } catch(e) {
+        // If quota full, use original display but still try AI
+      }
+
+      const b64 = compressed.split(',')[1];
       extractRoosterWithAI(b64, m);
     };
-    img.src=ev.target.result;
+    img.onerror = () => {
+      const status = document.getElementById('ai-status');
+      if(status) status.textContent = '⚠️ Afbeelding laden mislukt.';
+    };
+    img.src = originalSrc;
   };
   reader.readAsDataURL(file);
 }
 
+function removeUpload(m){
+  localStorage.removeItem('img_'+m);
+  toast('🗑️ Foto verwijderd');
+  render();
+}
+
 function buildUpload(m){
-  const wrap=document.getElementById('uploadWrap');
-  wrap.innerHTML='';
-  const saved=localStorage.getItem('img_'+m);
+  const wrap = document.getElementById('uploadWrap');
+  wrap.innerHTML = '';
+
+  // Show saved image if exists
+  const saved = localStorage.getItem('img_'+m);
   if(saved){
-    const iw=document.createElement('div'); iw.className='img-wrap';
-    const im=document.createElement('img'); im.src=saved;
-    const rm=document.createElement('button'); rm.className='img-remove'; rm.textContent='✕ Verwijder foto';
-    rm.onclick=()=>{ localStorage.removeItem('img_'+m); toast('🗑️ Foto verwijderd'); render(); };
-    iw.appendChild(im); iw.appendChild(rm); wrap.appendChild(iw);
+    const iw = document.createElement('div'); iw.className='img-wrap';
+    iw.innerHTML = `
+      <img src="${saved}" alt="Rooster ${m}" style="width:100%;border-radius:10px;border:1px solid var(--border);display:block">
+      <button class="img-remove" onclick="removeUpload('${m}')">✕ Verwijder foto</button>`;
+    wrap.appendChild(iw);
   }
-  const hasData=store[m]&&store[m].some(r=>r.jpa||r.gma2);
-  const zone=document.createElement('div'); zone.className='upload-zone';
-  zone.innerHTML=`<div style="font-size:28px;margin-bottom:6px">${hasData?'🔄':'📸'}</div>
-    <p style="font-weight:700">${hasData?'Nieuwe foto uploaden &amp; herschannen':'Upload Rooster Foto'}</p>
-    <span>🤖 AI leest automatisch alle shifts in — JPA &amp; GMA2</span>`;
-  const inp=document.createElement('input');
-  inp.type='file'; inp.accept='image/*';
-  inp.addEventListener('change',e=>{ const f=e.target.files[0]; if(f) processImageFile(f,m); inp.value=''; });
-  zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.classList.add('drag-over'); });
-  zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
-  zone.addEventListener('drop',e=>{ e.preventDefault(); zone.classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f) processImageFile(f,m); });
-  zone.appendChild(inp); wrap.appendChild(zone);
+
+  // Upload zone (always visible)
+  const hasData = store[m] && store[m].some(r => r.jpa || r.gma2);
+  const zone = document.createElement('div'); zone.className='upload-zone';
+  zone.innerHTML = `
+    <div style="font-size:26px;margin-bottom:6px">${saved ? '🔄' : '📸'}</div>
+    <p style="font-weight:700;color:var(--acl)">${saved ? 'Opnieuw scannen' : 'Upload Rooster Foto'}</p>
+    <span style="color:var(--ts)">🤖 AI leest automatisch alle shifts — klik of sleep</span>`;
+
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.addEventListener('change', e => { const f=e.target.files[0]; if(f) processImageFile(f,m); inp.value=''; });
+  zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+  zone.addEventListener('dragleave', ()  => zone.classList.remove('drag-over'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.classList.remove('drag-over');
+    const f = e.dataTransfer.files[0]; if(f) processImageFile(f, m);
+  });
+  zone.appendChild(inp);
+  wrap.appendChild(zone);
 }
 
 // ══════════════════════════════════════════
@@ -1169,6 +1293,7 @@ function render(){
   // Rebuild main if 2025 wiped it
   if(!document.getElementById('personCards')){
     document.querySelector('.main').innerHTML=`
+      <div class="upload-wrap" id="uploadWrap"></div>
       <div class="person-cards" id="personCards"></div>
       <div class="filter-row">
         <span class="filter-label">▼ PERSOON</span>
@@ -1176,7 +1301,6 @@ function render(){
         <button class="filter-btn off"    id="f-jpa"  onclick="setFilter('jpa')">JPA</button>
         <button class="filter-btn off"    id="f-gma"  onclick="setFilter('gma')">GMA2</button>
       </div>
-      <div class="upload-wrap" id="uploadWrap"></div>
       <div class="tbl-wrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
       <div class="legend-section">
         <div class="legend-title">Legenda</div>
@@ -1205,23 +1329,15 @@ function render(){
   document.getElementById('hTitle').textContent = `${m} 2026`;
   document.getElementById('hSub').textContent   = `Maandplanning – ${store[m].length} dagen`;
 
-  // Person cards
+  // Upload FIRST (top of page)
+  buildUpload(m);
+
+  // Person cards below upload
   const t=calcTotals(m);
   document.getElementById('personCards').innerHTML=`
-    <div class="person-card">
-      <div class="person-card-name">JPA</div>
-      <div class="person-card-row">WERKDAGEN <span>${t.jpadays}</span></div>
-      <div class="person-card-row">⏱ TOTAAL UREN <span>${t.jpa}U</span></div>
-      <div class="person-card-detail" onclick="setFilter('jpa')">↓ Tik voor details</div>
-    </div>
-    <div class="person-card gma">
-      <div class="person-card-name">GMA2</div>
-      <div class="person-card-row">WERKDAGEN <span>${t.gmadays}</span></div>
-      <div class="person-card-row">⏱ TOTAAL UREN <span>${t.gma}U</span></div>
-      <div class="person-card-detail" onclick="setFilter('gma')">↓ Tik voor details</div>
-    </div>`;
+    ${personCard('JPA', t.jpadays, t.jpa, t.jpaBreak, 'jpa')}
+    ${personCard('GMA2', t.gmadays, t.gma, t.gmaBreak, 'gma')}`;
 
-  buildUpload(m);
   renderTableOnly();
 }
 
@@ -1290,17 +1406,69 @@ function renderTableOnly(){
   });
 }
 
+function personCard(name, days, total, brk, filterKey){
+  const isGma = filterKey==='gma';
+  const accent = isGma ? '#60a5fa' : 'var(--accent)';
+  const bg     = isGma ? 'rgba(96,165,250,0.06)' : '';
+  const bdr    = isGma ? 'rgba(96,165,250,0.35)' : 'var(--border)';
+
+  // Shift rows: only show shifts that actually occurred
+  const shiftDefs = [
+    {k:'D',   label:'Dagdienst',        u:12, cls:'b-d'},
+    {k:'D*',  label:'Dagdienst*',       u:8,  cls:'b-ds'},
+    {k:'A',   label:'Avonddienst',      u:12, cls:'b-a'},
+    {k:'KW',  label:'Kantoorwerk',      u:4,  cls:'b-kw'},
+    {k:'R=A', label:'Reserve → Avond', u:12, cls:'b-ra'},
+    {k:'R=D', label:'Reserve → Dag',   u:12, cls:'b-rd'},
+    {k:'R',   label:'Reserve',          u:0,  cls:'b-r'},
+    {k:'VAK', label:'Vakantie',         u:0,  cls:'b-vak'},
+    {k:'X',   label:'Vrij',            u:0,  cls:'b-x'},
+  ];
+
+  const rows = shiftDefs
+    .filter(d => brk[d.k] > 0)
+    .map(d => {
+      const subtotal = d.u > 0 ? `${brk[d.k]} × ${d.u}u = <b>${brk[d.k]*d.u}u</b>` : `${brk[d.k]} dag${brk[d.k]>1?'en':''}`;
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04)">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span class="badge ${d.cls}" style="min-width:36px;padding:2px 7px;font-size:10px">${d.k}</span>
+          <span style="font-size:10px;color:var(--ts)">${d.label}</span>
+        </div>
+        <span style="font-size:10px;color:var(--tp);font-family:'JetBrains Mono',monospace">${subtotal}</span>
+      </div>`;
+    }).join('');
+
+  return `<div class="person-card${isGma?' gma':''}" style="background:${bg};border-color:${bdr}">
+    <details>
+      <summary style="list-style:none;cursor:pointer;outline:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span class="person-card-name" style="color:${accent}">${name}</span>
+          <span style="font-size:9px;color:var(--ts);margin-bottom:6px">▼ details</span>
+        </div>
+        <div class="person-card-row">WERKDAGEN <span style="color:${accent}">${days}</span></div>
+        <div class="person-card-row">⏱ TOTAAL UREN <span style="color:${accent}">${total}U</span></div>
+      </summary>
+      <div style="margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.07)">
+        <div style="font-size:9px;font-weight:700;color:var(--ts);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px">Berekening</div>
+        ${rows || '<div style="font-size:10px;color:var(--ts)">Geen shifts</div>'}
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.1)">
+          <span style="font-size:10px;font-weight:700;color:var(--ts)">TOTAAL</span>
+          <span style="font-size:13px;font-weight:900;color:${accent};font-family:'JetBrains Mono',monospace">${total}u</span>
+        </div>
+        <div class="person-card-detail" style="margin-top:8px" onclick="event.stopPropagation();setFilter('${filterKey}')">↓ Filter tabel op ${name}</div>
+      </div>
+    </details>
+  </div>`;
+}
+
 function refreshCards(){
   const m=current;
   const t=calcTotals(m);
   const cards=document.getElementById('personCards');
   if(!cards) return;
-  cards.querySelectorAll('.person-card-row span').forEach((el,i)=>{
-    if(i===0) el.textContent=t.jpadays;
-    if(i===1) el.textContent=`${t.jpa}U`;
-    if(i===2) el.textContent=t.gmadays;
-    if(i===3) el.textContent=`${t.gma}U`;
-  });
+  cards.innerHTML=`
+    ${personCard('JPA',  t.jpadays, t.jpa, t.jpaBreak, 'jpa')}
+    ${personCard('GMA2', t.gmadays, t.gma, t.gmaBreak, 'gma')}`;
 }
 
 // ══════════════════════════════════════════
