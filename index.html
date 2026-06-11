@@ -11,6 +11,7 @@
   --bg:      #0e1117;
   --surface: #161b27;
   --card:    #1c2333;
+  --panel:   #11151f;
   --border:  #252f42;
   --accent:  #e8692a;
   --acl:     #f5813d;
@@ -336,7 +337,7 @@ tbody tr.today td.dt-num-wrap .dt-num {
 // ══════════════════════════════════════════
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
-const MDAYS  = [31,29,31,30,31,30,31,31,30,31,30,31];
+const MDAYS  = [31,28,31,30,31,30,31,31,30,31,30,31]; // 2026 is geen schrikkeljaar
 const DNAMES = ['MA','DI','WO','DO','VR','ZA','ZO'];
 
 // ══════════════════════════════════════════
@@ -749,7 +750,7 @@ function save(m){
 
 function emptyMonth(idx){
   return Array.from({length:MDAYS[idx]},(_,i)=>({
-    date:i+1, day:DNAMES[i%7], jpa:'', gma2:'', op:''
+    date:i+1, day:DNAMES[(new Date(2026, idx, i+1).getDay()+6)%7], jpa:'', gma2:'', op:''
   }));
 }
 
@@ -760,11 +761,17 @@ function hrs(v){
   if(!v) return 0;
   const s=v.toUpperCase().trim();
   if(s==='D*'||s==='D* 12U') return 8;  // note: some screens show D* as 12u - keeping 8
-  if(s==='D'||s==='X/D') return 12;
+  if(s==='D'||s==='X/D'||s==='X=D') return 12;
   if(s==='A') return 12;
-  if(s==='KW') return 4;
+  if(s==='KW'||s==='R=KW') return 4;
   if(s==='R=A'||s==='R=D') return 12;
   return 0;
+}
+
+function escapeHtml(v){
+  return String(v).replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
 }
 
 function badgeClass(v){
@@ -774,9 +781,10 @@ function badgeClass(v){
   if(s==='KW')         return 'b-kw';
   if(s.startsWith('R=A')) return 'b-ra';
   if(s.startsWith('R=D')) return 'b-rd';
+  if(s==='R=KW')       return 'b-kw';
   if(s==='R')          return 'b-r';
   if(s==='D*')         return 'b-ds';
-  if(s==='D'||s==='X/D') return 'b-d';
+  if(s==='D'||s==='X/D'||s==='X=D') return 'b-d';
   if(s==='A')          return 'b-a';
   if(s==='X')          return 'b-x';
   return 'b-x';
@@ -874,9 +882,25 @@ function setFilter(f){
 // ══════════════════════════════════════════
 //  AI UPLOAD — show image first, then extract
 // ══════════════════════════════════════════
+function getApiKey(){
+  let key = '';
+  try{ key = localStorage.getItem('anthropic_api_key') || ''; }catch(e){}
+  if(!key){
+    key = (prompt('Voer je Anthropic API key in (sk-ant-...). Deze wordt alleen lokaal in je browser opgeslagen:') || '').trim();
+    if(key){ try{ localStorage.setItem('anthropic_api_key', key); }catch(e){} }
+  }
+  return key;
+}
+
 async function extractRoosterWithAI(b64, m){
   const status = document.getElementById('ai-status');
   const setStatus = (msg) => { if(status) status.textContent = msg; };
+
+  const apiKey = getApiKey();
+  if(!apiKey){
+    setStatus('⚠️ Geen API key ingevoerd — AI-scan geannuleerd. Klik op "Opnieuw scannen" om het nogmaals te proberen.');
+    return;
+  }
 
   setStatus('🤖 AI leest het rooster... even geduld');
 
@@ -903,11 +927,12 @@ Return ALL rows for every day shown.`;
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
         'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-opus-4-5',
+        model: 'claude-opus-4-8',
         max_tokens: 3000,
         messages: [{
           role: 'user',
@@ -920,6 +945,10 @@ Return ALL rows for every day shown.`;
     });
 
     if(!resp.ok) {
+      if(resp.status === 401){
+        try{ localStorage.removeItem('anthropic_api_key'); }catch(e){}
+        throw new Error('API key ongeldig (401). De opgeslagen key is gewist — probeer opnieuw met een geldige key.');
+      }
       const errText = await resp.text();
       throw new Error(`HTTP ${resp.status}: ${errText}`);
     }
@@ -1211,15 +1240,14 @@ function render2025(){
     </div>
   `;
 
-  // Build bar chart
+  // Build bar chart (accumulate string once — innerHTML += in a loop reparses everything each pass)
   const maxH = Math.max(...Object.values(stats.monthlyHrs), 144);
-  const barsEl = document.getElementById('monthBars');
+  let barsHtml = '';
   MONTHS2025.forEach(m=>{
     const h = stats.monthlyHrs[m]||0;
     const pct = Math.round((h/maxH)*100);
     const over = h>144;
-    const short = h.toString().substring(0,3);
-    barsEl.innerHTML += `
+    barsHtml += `
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
         <div style="width:30px;font-size:9px;color:var(--ts);flex-shrink:0">${m.substring(0,3).toUpperCase()}</div>
         <div style="flex:1;background:var(--panel);border-radius:4px;height:18px;overflow:hidden">
@@ -1228,6 +1256,7 @@ function render2025(){
         <div style="width:32px;font-size:10px;font-weight:700;color:${over?'#fb923c':'#4ade80'};text-align:right;font-family:'JetBrains Mono',monospace">${h}u</div>
       </div>`;
   });
+  document.getElementById('monthBars').innerHTML = barsHtml;
 
   // Build monthly table
   const mtBody = document.getElementById('monthTable');
@@ -1255,8 +1284,8 @@ function render2025(){
     <td style="padding:10px 8px;text-align:center;font-weight:900;font-family:'JetBrains Mono',monospace;color:${stats.overtime>0?'#fb923c':'#60a5fa'}">${stats.overtime>0?'+':''}${stats.totalHrs-stats.totalContracted}u</td>`;
   mtBody.appendChild(totalTr);
 
-  // Build per-month detail tables
-  const detailEl = document.getElementById('monthDetails');
+  // Build per-month detail tables (accumulate string once, lazy-load embedded images)
+  let detailsHtml = '';
   MONTHS2025.forEach(m=>{
     const data=DATA2025[m]||[];
     const mHrs=stats.monthlyHrs[m]||0;
@@ -1266,7 +1295,7 @@ function render2025(){
         <span>${m} 2025</span>
         <span style="font-family:'JetBrains Mono',monospace;color:#4ade80;font-size:13px">${mHrs}u</span>
       </summary>
-      ${imgSrc2025 ? `<img src="${imgSrc2025}" style="width:100%;max-height:280px;object-fit:contain;border-bottom:1px solid var(--border);background:#000;display:block">` : ''}
+      ${imgSrc2025 ? `<img src="${imgSrc2025}" loading="lazy" decoding="async" style="width:100%;max-height:280px;object-fit:contain;border-bottom:1px solid var(--border);background:#000;display:block">` : ''}
       <div style="overflow-x:auto">
       <table style="width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace">
         <thead><tr style="background:var(--panel)">
@@ -1285,13 +1314,14 @@ function render2025(){
         <td style="padding:7px 8px;text-align:center;color:var(--ts)">${row.day}</td>
         <td style="padding:7px 8px;text-align:center"><span class="badge ${bc}" style="min-width:36px;padding:3px 7px;font-size:10px">${row.gma2||'–'}</span></td>
         <td style="padding:7px 8px;text-align:center;font-weight:700;color:${h>0?'#4ade80':'var(--ts)'}">${h>0?h+'u':'–'}</td>
-        <td style="padding:7px 8px;color:var(--ts);font-size:10px;font-family:'Inter',sans-serif">${row.op||''}</td>
+        <td style="padding:7px 8px;color:var(--ts);font-size:10px;font-family:'Inter',sans-serif">${escapeHtml(row.op||'')}</td>
       </tr>`;
     });
 
     block+='</tbody></table></div></details>';
-    detailEl.innerHTML+=block;
+    detailsHtml+=block;
   });
+  document.getElementById('monthDetails').innerHTML = detailsHtml;
 }
 
 function export2025(){
@@ -1431,7 +1461,7 @@ function renderTableOnly(){
       dtd.innerHTML+=`<div class="today-label">Vandaag</div>`;
     }
     if(row.op && row.op!=='–' && row.op!==''){
-      dtd.innerHTML+=`<div class="holiday-tag">⭐ ${row.op}</div>`;
+      dtd.innerHTML+=`<div class="holiday-tag">⭐ ${escapeHtml(row.op)}</div>`;
     }
     tr.appendChild(dtd);
 
