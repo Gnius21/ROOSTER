@@ -73,7 +73,7 @@ body {
 /* ── PERSON CARDS ── */
 .person-cards {
   display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
-  margin-bottom: 16px;
+  margin-top: 20px; margin-bottom: 16px;
 }
 .person-card {
   background: var(--card); border: 1px solid var(--border);
@@ -284,9 +284,6 @@ tbody tr.today td.dt-num-wrap .dt-num {
 <div class="tabs-scroll" id="tabs"></div>
 
 <div class="main">
-  <!-- Person summary cards -->
-  <div class="person-cards" id="personCards"></div>
-
   <!-- Filter -->
   <div class="filter-row">
     <span class="filter-label">▼ PERSOON</span>
@@ -294,9 +291,6 @@ tbody tr.today td.dt-num-wrap .dt-num {
     <button class="filter-btn off"    id="f-jpa"  onclick="setFilter('jpa')">JPA</button>
     <button class="filter-btn off"    id="f-gma"  onclick="setFilter('gma')">GMA2</button>
   </div>
-
-  <!-- Upload -->
-  <div class="upload-wrap" id="uploadWrap"></div>
 
   <!-- Table -->
   <div class="tbl-wrap">
@@ -321,6 +315,12 @@ tbody tr.today td.dt-num-wrap .dt-num {
       <div class="leg"><span class="badge b-ra" style="min-width:auto;padding:3px 8px">R=A</span> Reserve→Avond – 12u</div>
     </div>
   </div>
+
+  <!-- Person summary cards -->
+  <div class="person-cards" id="personCards"></div>
+
+  <!-- Upload -->
+  <div class="upload-wrap" id="uploadWrap"></div>
 
   <div class="actions">
     <button class="btn btn-orange" onclick="exportXlsx()">📥 Export Excel</button>
@@ -1379,8 +1379,6 @@ function render(){
   // Rebuild main if 2025 wiped it
   if(!document.getElementById('personCards')){
     document.querySelector('.main').innerHTML=`
-      <div class="upload-wrap" id="uploadWrap"></div>
-      <div class="person-cards" id="personCards"></div>
       <div class="filter-row">
         <span class="filter-label">▼ PERSOON</span>
         <button class="filter-btn on-all" id="f-all"  onclick="setFilter('all')">Iedereen</button>
@@ -1402,6 +1400,8 @@ function render(){
           <div class="leg"><span class="badge b-ra" style="min-width:auto;padding:3px 8px">R=A</span> Reserve→Avond – 12u</div>
         </div>
       </div>
+      <div class="person-cards" id="personCards"></div>
+      <div class="upload-wrap" id="uploadWrap"></div>
       <div class="actions">
         <button class="btn btn-orange" onclick="exportXlsx()">📥 Export Excel</button>
         <button class="btn btn-ghost"  onclick="clearMonth()">🗑️ Wis maand</button>
@@ -1415,10 +1415,10 @@ function render(){
   document.getElementById('hTitle').textContent = `${m} 2026`;
   document.getElementById('hSub').textContent   = `Maandplanning – ${store[m].length} dagen`;
 
-  // Upload FIRST (top of page)
+  // Upload (now at the bottom of the page)
   buildUpload(m);
 
-  // Person cards below upload
+  // Person cards (below the table, above upload)
   const t=calcTotals(m);
   document.getElementById('personCards').innerHTML=`
     ${personCard('JPA', t.jpadays, t.jpa, t.jpaBreak, 'jpa')}
