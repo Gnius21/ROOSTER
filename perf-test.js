@@ -121,6 +121,7 @@ const sandbox = {
   confirm: () => false,
   prompt: () => null,
   alert: () => {},
+  navigator: { serviceWorker: { register: () => Promise.resolve() } },
   fetch: () => Promise.reject(new Error('no network in test')),
   console,
 };

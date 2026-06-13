@@ -1,0 +1,18 @@
+{
+  "name": "Rooster Observatoren 2026",
+  "short_name": "Rooster",
+  "description": "Maandplanning shift-rooster voor observatoren",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0e1117",
+  "theme_color": "#e8692a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
