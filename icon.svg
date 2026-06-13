@@ -1,45 +1,57 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#1c2333"/>
-      <stop offset="100%" stop-color="#0d1020"/>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e2840"/>
+      <stop offset="100%" stop-color="#0a0e1a"/>
     </linearGradient>
+    <linearGradient id="og" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f5813d"/>
+      <stop offset="100%" stop-color="#d85a18"/>
+    </linearGradient>
+    <linearGradient id="ogd" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#c2561a" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#8c3a0e" stop-opacity="0.85"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="6" result="blur"/>
+      <feFlood flood-color="#f5813d" flood-opacity="0.35" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
   </defs>
 
   <!-- Background -->
-  <rect width="512" height="512" rx="96" fill="url(#bg)"/>
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
 
-  <!-- Header row (column titles) -->
-  <rect x="80" y="52" width="152" height="52" rx="12" fill="#e8692a"/>
-  <rect x="248" y="52" width="152" height="52" rx="12" fill="#e8692a" opacity="0.6"/>
+  <!-- Subtle grid lines -->
+  <line x1="268" y1="52" x2="268" y2="460" stroke="#ffffff" stroke-opacity="0.04" stroke-width="2"/>
+  <line x1="72"  y1="166" x2="440" y2="166" stroke="#ffffff" stroke-opacity="0.04" stroke-width="2"/>
+  <line x1="72"  y1="274" x2="440" y2="274" stroke="#ffffff" stroke-opacity="0.04" stroke-width="2"/>
+  <line x1="72"  y1="382" x2="440" y2="382" stroke="#ffffff" stroke-opacity="0.04" stroke-width="2"/>
 
-  <!-- Divider -->
-  <rect x="56" y="116" width="400" height="3" rx="1" fill="#252f42"/>
+  <!-- Column header dots -->
+  <circle cx="170" cy="42" r="8" fill="#e8692a" opacity="0.9"/>
+  <circle cx="354" cy="42" r="8" fill="#e8692a" opacity="0.45"/>
 
-  <!-- Thin day-indicator strip (left) + 2 shift columns — 5 rows (Mon–Fri) -->
+  <!-- ROW 1 -->
+  <rect x="72" y="58" width="184" height="96" rx="20" fill="url(#og)" filter="url(#glow)"/>
+  <rect x="268" y="58" width="172" height="96" rx="20" fill="#1c2740"/>
 
-  <!-- ROW 1 — MA -->
-  <rect x="56"  y="130" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="130" width="152" height="56" rx="12" fill="#e8692a"/>          <!-- D -->
-  <rect x="248" y="130" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
+  <!-- ROW 2 -->
+  <rect x="72" y="178" width="184" height="96" rx="20" fill="#1c2740"/>
+  <rect x="268" y="178" width="172" height="96" rx="20" fill="url(#og)" filter="url(#glow)"/>
 
-  <!-- ROW 2 — DI -->
-  <rect x="56"  y="198" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="198" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
-  <rect x="248" y="198" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
+  <!-- ROW 3 -->
+  <rect x="72" y="298" width="184" height="96" rx="20" fill="url(#og)" filter="url(#glow)"/>
+  <rect x="268" y="298" width="172" height="96" rx="20" fill="url(#ogd)"/>
 
-  <!-- ROW 3 — WO -->
-  <rect x="56"  y="266" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="266" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
-  <rect x="248" y="266" width="152" height="56" rx="12" fill="#e8692a" opacity="0.55"/> <!-- A -->
+  <!-- ROW 4 -->
+  <rect x="72" y="418" width="184" height="72" rx="20" fill="#1c2740"/>
+  <rect x="268" y="418" width="172" height="72" rx="20" fill="url(#og)" filter="url(#glow)"/>
 
-  <!-- ROW 4 — DO -->
-  <rect x="56"  y="334" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="334" width="152" height="56" rx="12" fill="#e8692a" opacity="0.35"/> <!-- R -->
-  <rect x="248" y="334" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
-
-  <!-- ROW 5 — VR -->
-  <rect x="56"  y="402" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="402" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
-  <rect x="248" y="402" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
+  <!-- Shine on orange cells -->
+  <rect x="72"  y="58"  width="184" height="28" rx="20" fill="white" opacity="0.07"/>
+  <rect x="268" y="178" width="172" height="28" rx="20" fill="white" opacity="0.07"/>
+  <rect x="72"  y="298" width="184" height="28" rx="20" fill="white" opacity="0.07"/>
+  <rect x="268" y="418" width="172" height="28" rx="20" fill="white" opacity="0.07"/>
 </svg>
