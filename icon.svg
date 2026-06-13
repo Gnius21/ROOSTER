@@ -6,40 +6,49 @@
     </linearGradient>
   </defs>
 
-  <!-- Background -->
+  <!-- Background rounded square -->
   <rect width="512" height="512" rx="96" fill="url(#bg)"/>
 
-  <!-- Header row (column titles) -->
-  <rect x="80" y="52" width="152" height="52" rx="12" fill="#e8692a"/>
-  <rect x="248" y="52" width="152" height="52" rx="12" fill="#e8692a" opacity="0.6"/>
+  <!-- Calendar hangers -->
+  <rect x="152" y="58" width="26" height="60" rx="13" fill="#e8692a"/>
+  <rect x="334" y="58" width="26" height="60" rx="13" fill="#e8692a"/>
 
-  <!-- Divider -->
-  <rect x="56" y="116" width="400" height="3" rx="1" fill="#252f42"/>
+  <!-- Calendar outer frame bottom half (dark) -->
+  <rect x="56" y="164" width="400" height="284" rx="0" fill="#161b27"/>
+  <rect x="56" y="424" width="400" height="24" rx="0" ry="0" fill="#161b27"/>
+  <rect x="56" y="164" width="400" height="288" rx="0" fill="#161b27"/>
+  <!-- Round bottom corners of calendar -->
+  <rect x="56" y="160" width="400" height="296" rx="24" fill="#161b27"/>
 
-  <!-- Thin day-indicator strip (left) + 2 shift columns — 5 rows (Mon–Fri) -->
+  <!-- Orange header band -->
+  <rect x="56" y="86" width="400" height="100" rx="24" fill="#e8692a"/>
+  <!-- Straight-bottom filler so header meets body -->
+  <rect x="56" y="162" width="400" height="24" fill="#e8692a"/>
 
-  <!-- ROW 1 — MA -->
-  <rect x="56"  y="130" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="130" width="152" height="56" rx="12" fill="#e8692a"/>          <!-- D -->
-  <rect x="248" y="130" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
+  <!-- Divider line -->
+  <rect x="56" y="185" width="400" height="3" fill="#252f42"/>
 
-  <!-- ROW 2 — DI -->
-  <rect x="56"  y="198" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="198" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
-  <rect x="248" y="198" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
+  <!-- Grid cells — 3 columns × 4 rows -->
+  <!-- col x: 76, 208, 340  width: 108   gap: 24 -->
+  <!-- row y: 204, 264, 324, 384  height: 44  gap: 20 -->
 
-  <!-- ROW 3 — WO -->
-  <rect x="56"  y="266" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="266" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
-  <rect x="248" y="266" width="152" height="56" rx="12" fill="#e8692a" opacity="0.55"/> <!-- A -->
+  <!-- Row 1 -->
+  <rect x="76"  y="204" width="108" height="44" rx="10" fill="#252f42"/>
+  <rect x="208" y="204" width="108" height="44" rx="10" fill="#e8692a"/>
+  <rect x="340" y="204" width="96"  height="44" rx="10" fill="#252f42"/>
 
-  <!-- ROW 4 — DO -->
-  <rect x="56"  y="334" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="334" width="152" height="56" rx="12" fill="#e8692a" opacity="0.35"/> <!-- R -->
-  <rect x="248" y="334" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
+  <!-- Row 2 -->
+  <rect x="76"  y="264" width="108" height="44" rx="10" fill="#e8692a" opacity="0.8"/>
+  <rect x="208" y="264" width="108" height="44" rx="10" fill="#252f42"/>
+  <rect x="340" y="264" width="96"  height="44" rx="10" fill="#e8692a" opacity="0.55"/>
 
-  <!-- ROW 5 — VR -->
-  <rect x="56"  y="402" width="12" height="56" rx="4" fill="#e8692a" opacity="0.45"/>
-  <rect x="80"  y="402" width="152" height="56" rx="12" fill="#e8692a"/>           <!-- D -->
-  <rect x="248" y="402" width="152" height="56" rx="12" fill="#1c2333"/>           <!-- X -->
+  <!-- Row 3 -->
+  <rect x="76"  y="324" width="108" height="44" rx="10" fill="#252f42"/>
+  <rect x="208" y="324" width="108" height="44" rx="10" fill="#e8692a" opacity="0.65"/>
+  <rect x="340" y="324" width="96"  height="44" rx="10" fill="#252f42"/>
+
+  <!-- Row 4 -->
+  <rect x="76"  y="384" width="108" height="44" rx="10" fill="#e8692a" opacity="0.45"/>
+  <rect x="208" y="384" width="108" height="44" rx="10" fill="#252f42"/>
+  <rect x="340" y="384" width="96"  height="44" rx="10" fill="#e8692a" opacity="0.6"/>
 </svg>
