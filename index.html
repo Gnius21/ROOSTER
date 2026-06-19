@@ -338,14 +338,11 @@ tbody tr.today td.dt-num-wrap .dt-num {
 <div id="toast"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
-// Set to your Cloudflare Worker URL after deploying proxy/worker.js.
-// Leave '' to use the URL saved in the app's settings field instead.
-const PROXY_URL = '';
-
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 const MDAYS  = [31,28,31,30,31,30,31,31,30,31,30,31]; // 2026 is geen schrikkeljaar
@@ -944,90 +941,149 @@ function setFilter(f){
 }
 
 // ══════════════════════════════════════════
-//  PHOTO UPLOAD + AI SCAN (via proxy)
+//  PHOTO UPLOAD + LOCAL OCR SCAN (no API, no server)
+//  Uses Tesseract.js entirely in the browser.
 // ══════════════════════════════════════════
-function getProxyUrl(){
-  if(PROXY_URL) return PROXY_URL;
-  try{ return localStorage.getItem('rooster_proxy_url')||''; }catch(e){ return ''; }
-}
-function saveProxyUrl(url){
-  const clean = url.trim();
-  try{ localStorage.setItem('rooster_proxy_url', clean); }catch(e){}
-  buildUpload(current);
-  toast(clean ? '✅ Proxy URL opgeslagen' : 'Proxy URL gewist');
+const KNOWN_SHIFTS = ['X','D','D*','A','KW','R','R=A','R=D','R=KW','VAK','VG'];
+
+function levenshtein(a, b){
+  const m=a.length, n=b.length;
+  const d=Array.from({length:m+1},(_,i)=>[i,...Array(n).fill(0)]);
+  for(let j=0;j<=n;j++) d[0][j]=j;
+  for(let i=1;i<=m;i++) for(let j=1;j<=n;j++)
+    d[i][j]=Math.min(d[i-1][j]+1, d[i][j-1]+1, d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));
+  return d[m][n];
 }
 
-async function extractRoosterWithProxy(b64, m){
-  const proxyUrl = getProxyUrl();
-  const status   = document.getElementById('ai-status');
+// Snap a raw OCR cell to the nearest known shift code.
+function normShift(raw){
+  if(!raw) return '';
+  let s = raw.toUpperCase().replace(/\s+/g,'')
+            .replace(/[—–·.,;:]/g,'')   // stray punctuation
+            .replace(/0/g,'O');          // OCR often reads O as 0
+  // Common letter confusions inside codes
+  s = s.replace(/[|!]/g,'').replace(/=+/,'=');
+  if(s==='' ) return '';
+  if(KNOWN_SHIFTS.includes(s)) return s;
+  // fuzzy match
+  let best='', bestD=99;
+  for(const code of KNOWN_SHIFTS){
+    const dist = levenshtein(s, code);
+    if(dist<bestD){ bestD=dist; best=code; }
+  }
+  return bestD<=1 ? best : s;   // keep raw if no close match (user corrects)
+}
+
+// Collect words+bbox from a Tesseract result across API shapes.
+function collectWords(data){
+  if(Array.isArray(data.words) && data.words.length) return data.words;
+  const out=[];
+  (data.blocks||[]).forEach(b=>(b.paragraphs||[]).forEach(p=>(p.lines||[]).forEach(l=>
+    (l.words||[]).forEach(w=>out.push(w)))));
+  return out;
+}
+
+async function scanRoosterOCR(srcCanvas, m){
+  const status = document.getElementById('ai-status');
   const set = html => { if(status) status.innerHTML = html; };
 
-  if(!proxyUrl){
-    set('⚠️ Geen proxy URL ingesteld. Vul de URL in het veld hierboven in en sla op.');
+  if(typeof Tesseract === 'undefined'){
+    set('⚠️ OCR-bibliotheek niet geladen. Controleer je internetverbinding en herlaad de pagina.');
     return;
   }
 
-  set('🤖 AI leest het rooster...');
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60000);
-
+  const idx = MONTHS.indexOf(m);
+  let worker;
   try {
-    const resp = await fetch(proxyUrl, {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 3000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
-            { type: 'text', text: `Dutch observatory work schedule image.
-Return ONLY a raw JSON array — no markdown, no explanation.
-Format: [{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},...]
-Columns: date=DAT(number), day=DAG(MA/DI/WO/DO/VR/ZA/ZO), jpa=JPA, gma2=GMA, op=OPMERKING or "".
-Valid codes: X D D* A KW R R=A R=D R=KW VAK VG. Return ALL rows.` }
-          ]
-        }]
-      })
+    set('🔍 OCR wordt geladen (eenmalig downloaden)...');
+    worker = await Tesseract.createWorker('eng', 1, {
+      logger: msg => {
+        if(msg.status==='recognizing text')
+          set(`🔍 Tekst lezen... ${Math.round((msg.progress||0)*100)}%`);
+      }
     });
-    clearTimeout(timer);
+    await worker.setParameters({ tessedit_pageseg_mode: '6' }); // assume a uniform block
 
-    if(!resp.ok){
-      const txt = await resp.text();
-      throw new Error(`HTTP ${resp.status}: ${txt.slice(0,200)}`);
+    const { data } = await worker.recognize(srcCanvas, {}, { blocks: true });
+    await worker.terminate();
+
+    const words = collectWords(data)
+      .map(w => ({
+        text: (w.text||'').trim(),
+        cx: (w.bbox.x0 + w.bbox.x1)/2,
+        cy: (w.bbox.y0 + w.bbox.y1)/2,
+        h:  (w.bbox.y1 - w.bbox.y0)
+      }))
+      .filter(w => w.text);
+
+    if(words.length < 10) throw new Error('Te weinig tekst herkend — probeer een scherpere, rechte foto.');
+
+    // ── Detect column anchors from the header row ──
+    const HEADERS = {DAG:/^DAG$/i, DAT:/^DAT$/i, JPA:/^JPA$/i, GMA:/^GMA2?$/i, OPM:/^OPMERK/i};
+    const anchors = {};
+    for(const w of words){
+      for(const [key,re] of Object.entries(HEADERS)){
+        if(re.test(w.text) && anchors[key]===undefined) anchors[key]=w.cx;
+      }
     }
-    const data  = await resp.json();
-    const raw   = (data.content||[]).map(c=>c.text||'').join('').trim();
-    const match = raw.replace(/```json|```/gi,'').match(/\[[\s\S]*\]/);
-    if(!match) throw new Error('Geen JSON array in AI-antwoord');
-    const rows  = JSON.parse(match[0]);
-    if(!Array.isArray(rows)||rows.length===0) throw new Error('Lege array');
+    if(anchors.JPA===undefined || anchors.GMA===undefined)
+      throw new Error('Kon de JPA/GMA kolommen niet vinden in de foto. Maak een rechtere foto van de hele tabel.');
 
-    store[m] = rows.map(r=>({
-      date: parseInt(r.date)||0,
-      day:  (r.day||'').toUpperCase().trim(),
-      jpa:  (r.jpa||'').toUpperCase().trim(),
-      gma2: (r.gma2||'').toUpperCase().trim(),
-      op:   (r.op||'').trim()
-    }));
+    // ── Cluster words into rows by vertical position ──
+    const medH = words.map(w=>w.h).sort((a,b)=>a-b)[Math.floor(words.length/2)] || 20;
+    const sorted = [...words].sort((a,b)=>a.cy-b.cy);
+    const rows=[]; let cur=[];
+    for(const w of sorted){
+      if(cur.length===0 || Math.abs(w.cy - cur[cur.length-1].cy) < medH*0.7){ cur.push(w); }
+      else { rows.push(cur); cur=[w]; }
+    }
+    if(cur.length) rows.push(cur);
+
+    // ── Build month from a clean base; map OCR rows by their day number ──
+    const base = emptyMonth(idx);
+    const nearest = (row, x) => {
+      let best=null, bd=1e9;
+      for(const w of row){ const d=Math.abs(w.cx-x); if(d<bd){bd=d; best=w;} }
+      return best;
+    };
+    let filled=0;
+    for(const row of rows){
+      // date = a 1..31 integer near the DAT column (or leftmost number)
+      let date=0;
+      const datX = anchors.DAT!==undefined ? anchors.DAT : 0;
+      const nums = row.filter(w=>/^\d{1,2}$/.test(w.text))
+                      .sort((a,b)=>Math.abs(a.cx-datX)-Math.abs(b.cx-datX));
+      if(nums.length){ const n=parseInt(nums[0].text,10); if(n>=1&&n<=base.length) date=n; }
+      if(!date) continue;
+
+      const jpaW = nearest(row, anchors.JPA);
+      const gmaW = nearest(row, anchors.GMA);
+      const r = base[date-1];
+      if(jpaW) r.jpa  = normShift(jpaW.text);
+      if(gmaW) r.gma2 = normShift(gmaW.text);
+      if(anchors.OPM!==undefined){
+        const opWords = row.filter(w=>w.cx > anchors.OPM - medH)
+                           .map(w=>w.text).join(' ').trim();
+        if(opWords && !/^\d+$/.test(opWords)) r.op = opWords;
+      }
+      filled++;
+    }
+
+    if(filled===0) throw new Error('Geen dagen herkend. Probeer een scherpere foto recht van boven.');
+
+    store[m] = base;
     try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){}
-    set(`✅ ${rows.length} rijen ingelezen voor ${m}! Klik een badge om handmatig te wijzigen.`);
-    setTimeout(()=>render(), 1000);
+    set(`✅ ${filled} dagen ingelezen voor ${m}! <span style="color:var(--ts)">Controleer de waarden en klik een badge om te corrigeren.</span>`);
+    setTimeout(()=>render(), 1200);
 
-  } catch(err) {
-    clearTimeout(timer);
-    window.__b64=b64; window.__scanMonth=m;
-    const msg = err.name==='AbortError'
-      ? 'Timeout — controleer je verbinding en probeer opnieuw.'
-      : err.message;
-    set(`⚠️ ${msg}<br><br>
-      <button onclick="extractRoosterWithProxy(window.__b64,window.__scanMonth)"
+  } catch(err){
+    if(worker){ try{ await worker.terminate(); }catch(e){} }
+    window.__ocrCanvas = srcCanvas; window.__ocrMonth = m;
+    set(`⚠️ ${err.message}<br><br>
+      <button onclick="scanRoosterOCR(window.__ocrCanvas, window.__ocrMonth)"
         style="padding:6px 18px;background:var(--accent);color:#fff;border:none;
                border-radius:6px;font-weight:700;cursor:pointer;font-size:12px">
-        🔄 Opnieuw
+        🔄 Opnieuw scannen
       </button>`);
   }
 }
@@ -1054,32 +1110,37 @@ function processImageFile(file, m){
         ⏳ Afbeelding opslaan...
       </div>`;
 
-    // ── Step 2: compress, save as reference, then AI-scan if proxy is set ──
+    // ── Step 2: save a preview, build a high-contrast OCR canvas, scan locally ──
     const img = new Image();
     img.onload = () => {
-      const status = document.getElementById('ai-status');
+      // (a) Preview image for localStorage (small JPEG)
+      const PMAX = 1100;
+      let pw = img.width, ph = img.height;
+      if(pw > PMAX){ ph = Math.round(ph * PMAX / pw); pw = PMAX; }
+      const pc = document.createElement('canvas');
+      pc.width = pw; pc.height = ph;
+      pc.getContext('2d').drawImage(img, 0, 0, pw, ph);
+      try { localStorage.setItem('img_' + m, pc.toDataURL('image/jpeg', 0.82)); } catch(e) {}
 
-      // 1100px keeps the saved image small enough for localStorage (~300-500 KB)
-      const MAX = 1100;
-      let w = img.width, h = img.height;
-      if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
-
-      const canvas = document.createElement('canvas');
-      canvas.width = w; canvas.height = h;
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.82);
-
-      // Always save the preview
-      try { localStorage.setItem('img_' + m, compressed); } catch(e) {}
-
-      const b64 = compressed.split(',')[1];
-      if(getProxyUrl()){
-        extractRoosterWithProxy(b64, m);
-      } else {
-        if(status) status.innerHTML = `✅ Foto opgeslagen als referentie voor ${m}.<br>
-          <span style="color:var(--ts)">Stel een proxy URL in om shifts automatisch in te lezen.</span>`;
-        setTimeout(()=>render(), 1200);
+      // (b) Larger grayscale/contrast canvas for OCR accuracy
+      const OMAX = 1600;
+      let ow = img.width, oh = img.height;
+      if(ow > OMAX){ oh = Math.round(oh * OMAX / ow); ow = OMAX; }
+      const oc = document.createElement('canvas');
+      oc.width = ow; oc.height = oh;
+      const octx = oc.getContext('2d');
+      octx.drawImage(img, 0, 0, ow, oh);
+      const id = octx.getImageData(0, 0, ow, oh);
+      const px = id.data;
+      for(let i=0;i<px.length;i+=4){
+        // luminance → contrast stretch
+        let g = 0.299*px[i] + 0.587*px[i+1] + 0.114*px[i+2];
+        g = g < 140 ? Math.max(0, g-40) : Math.min(255, g+40);
+        px[i]=px[i+1]=px[i+2]=g;
       }
+      octx.putImageData(id, 0, 0);
+
+      scanRoosterOCR(oc, m);
     };
     img.onerror = () => {
       const status = document.getElementById('ai-status');
@@ -1110,31 +1171,12 @@ function buildUpload(m){
     wrap.appendChild(iw);
   }
 
-  // Proxy URL setup — show a one-time settings strip if not yet configured
-  const proxyConfigured = !!getProxyUrl();
-  if(!proxyConfigured){
-    const cfg = document.createElement('div');
-    cfg.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:12px';
-    cfg.innerHTML=`
-      <div style="font-weight:700;color:var(--acl);margin-bottom:8px">⚙️ AI-scan proxy instellen</div>
-      <div style="color:var(--ts);margin-bottom:8px">Voer je Cloudflare Worker URL in (zie <code>proxy/worker.js</code>):</div>
-      <div style="display:flex;gap:6px">
-        <input id="proxy-url-inp" type="url" placeholder="https://rooster-proxy.xxx.workers.dev"
-          style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;
-                 padding:6px 10px;color:var(--tp);font-size:12px;outline:none">
-        <button onclick="saveProxyUrl(document.getElementById('proxy-url-inp').value)"
-          style="padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;
-                 font-weight:700;cursor:pointer;font-size:12px">Opslaan</button>
-      </div>`;
-    wrap.appendChild(cfg);
-  }
-
   // Upload zone (always visible)
   const zone = document.createElement('div'); zone.className='upload-zone';
   zone.innerHTML = `
     <div style="font-size:26px;margin-bottom:6px">${saved ? '🔄' : '📸'}</div>
     <p style="font-weight:700;color:var(--acl)">${saved ? 'Andere foto kiezen' : 'Upload Rooster Foto'}</p>
-    <span style="color:var(--ts)">${proxyConfigured ? '🤖 AI leest automatisch alle shifts — klik of sleep' : 'Stel proxy in ↑ voor automatisch inlezen — of sleep foto als referentie'}</span>`;
+    <span style="color:var(--ts)">🔍 Leest shifts automatisch in je browser — klik of sleep</span>`;
 
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'image/*';

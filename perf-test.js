@@ -159,7 +159,7 @@ const exportShim = `
   MONTHS, MDAYS, PRESET, MONTHS2025, DATA2025,
   emptyMonth, hrs, escapeHtml, badgeClass, calcTotals, calc2025Yearly,
   renderTableOnly, render, render2025, exportXlsx, export2025,
-  undoPush, undoEdit,
+  undoPush, undoEdit, normShift,
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
   getUndoStack: () => undoStack,
@@ -208,8 +208,13 @@ check("hrs('R=KW') === 4 (was 0 before fix)", ctx.hrs('R=KW') === 4, `got ${ctx.
 check("badgeClass('X=D') === 'b-d'", ctx.badgeClass('X=D') === 'b-d', ctx.badgeClass('X=D'));
 check("badgeClass('R=KW') === 'b-kw'", ctx.badgeClass('R=KW') === 'b-kw', ctx.badgeClass('R=KW'));
 check("escapeHtml neutralises HTML", ctx.escapeHtml('<img src=x onerror="x">') === '&lt;img src=x onerror=&quot;x&quot;&gt;', ctx.escapeHtml('<img src=x onerror="x">'));
-check("AI scan uses proxy (no API key in browser, no direct Anthropic endpoint)", !pageScript.includes("anthropic_api_key") && !pageScript.includes("api.anthropic.com") && pageScript.includes("PROXY_URL"));
+check("scan runs fully client-side (no API key, no server endpoint)", !pageScript.includes("anthropic_api_key") && !pageScript.includes("api.anthropic.com") && !pageScript.includes("PROXY_URL"));
+check("scan uses local Tesseract OCR", pageScript.includes("Tesseract") && pageScript.includes("scanRoosterOCR"));
 check("photo reference image saved to localStorage", pageScript.includes("localStorage.setItem('img_'") || pageScript.includes("img_' + m"));
+// normShift snaps OCR noise to the nearest known shift code
+check("normShift maps clean codes (case-insensitive)", ctx.normShift('d*') === 'D*' && ctx.normShift('vak') === 'VAK', `${ctx.normShift('d*')}, ${ctx.normShift('vak')}`);
+check("normShift fuzzy-corrects a 1-char OCR error (VAX→VAK)", ctx.normShift('VAX') === 'VAK', ctx.normShift('VAX'));
+check("normShift returns '' for empty input", ctx.normShift('') === '');
 
 // calcTotals consistency: total hours must equal the manual per-row sum
 const t = ctx.calcTotals('February');
