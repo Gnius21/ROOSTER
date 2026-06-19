@@ -342,6 +342,10 @@ tbody tr.today td.dt-num-wrap .dt-num {
 // ══════════════════════════════════════════
 //  CONFIG
 // ══════════════════════════════════════════
+// Set to your Cloudflare Worker URL after deploying proxy/worker.js.
+// Leave '' to use the URL saved in the app's settings field instead.
+const PROXY_URL = '';
+
 const MONTHS = ['January','February','March','April','May','June',
                 'July','August','September','October','November','December'];
 const MDAYS  = [31,28,31,30,31,30,31,31,30,31,30,31]; // 2026 is geen schrikkeljaar
@@ -940,9 +944,94 @@ function setFilter(f){
 }
 
 // ══════════════════════════════════════════
-//  PHOTO UPLOAD — saved as a visual reference
-//  (no API key / no network call required)
+//  PHOTO UPLOAD + AI SCAN (via proxy)
 // ══════════════════════════════════════════
+function getProxyUrl(){
+  if(PROXY_URL) return PROXY_URL;
+  try{ return localStorage.getItem('rooster_proxy_url')||''; }catch(e){ return ''; }
+}
+function saveProxyUrl(url){
+  const clean = url.trim();
+  try{ localStorage.setItem('rooster_proxy_url', clean); }catch(e){}
+  buildUpload(current);
+  toast(clean ? '✅ Proxy URL opgeslagen' : 'Proxy URL gewist');
+}
+
+async function extractRoosterWithProxy(b64, m){
+  const proxyUrl = getProxyUrl();
+  const status   = document.getElementById('ai-status');
+  const set = html => { if(status) status.innerHTML = html; };
+
+  if(!proxyUrl){
+    set('⚠️ Geen proxy URL ingesteld. Vul de URL in het veld hierboven in en sla op.');
+    return;
+  }
+
+  set('🤖 AI leest het rooster...');
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 60000);
+
+  try {
+    const resp = await fetch(proxyUrl, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 3000,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+            { type: 'text', text: `Dutch observatory work schedule image.
+Return ONLY a raw JSON array — no markdown, no explanation.
+Format: [{"date":1,"day":"MA","jpa":"KW","gma2":"D","op":""},...]
+Columns: date=DAT(number), day=DAG(MA/DI/WO/DO/VR/ZA/ZO), jpa=JPA, gma2=GMA, op=OPMERKING or "".
+Valid codes: X D D* A KW R R=A R=D R=KW VAK VG. Return ALL rows.` }
+          ]
+        }]
+      })
+    });
+    clearTimeout(timer);
+
+    if(!resp.ok){
+      const txt = await resp.text();
+      throw new Error(`HTTP ${resp.status}: ${txt.slice(0,200)}`);
+    }
+    const data  = await resp.json();
+    const raw   = (data.content||[]).map(c=>c.text||'').join('').trim();
+    const match = raw.replace(/```json|```/gi,'').match(/\[[\s\S]*\]/);
+    if(!match) throw new Error('Geen JSON array in AI-antwoord');
+    const rows  = JSON.parse(match[0]);
+    if(!Array.isArray(rows)||rows.length===0) throw new Error('Lege array');
+
+    store[m] = rows.map(r=>({
+      date: parseInt(r.date)||0,
+      day:  (r.day||'').toUpperCase().trim(),
+      jpa:  (r.jpa||'').toUpperCase().trim(),
+      gma2: (r.gma2||'').toUpperCase().trim(),
+      op:   (r.op||'').trim()
+    }));
+    try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){}
+    set(`✅ ${rows.length} rijen ingelezen voor ${m}! Klik een badge om handmatig te wijzigen.`);
+    setTimeout(()=>render(), 1000);
+
+  } catch(err) {
+    clearTimeout(timer);
+    window.__b64=b64; window.__scanMonth=m;
+    const msg = err.name==='AbortError'
+      ? 'Timeout — controleer je verbinding en probeer opnieuw.'
+      : err.message;
+    set(`⚠️ ${msg}<br><br>
+      <button onclick="extractRoosterWithProxy(window.__b64,window.__scanMonth)"
+        style="padding:6px 18px;background:var(--accent);color:#fff;border:none;
+               border-radius:6px;font-weight:700;cursor:pointer;font-size:12px">
+        🔄 Opnieuw
+      </button>`);
+  }
+}
+
 function processImageFile(file, m){
   if(!file || !file.type.startsWith('image/')){ toast('⚠️ Selecteer een afbeelding.'); return; }
 
@@ -965,12 +1054,12 @@ function processImageFile(file, m){
         ⏳ Afbeelding opslaan...
       </div>`;
 
-    // ── Step 2: compress & save as a reference image ──
+    // ── Step 2: compress, save as reference, then AI-scan if proxy is set ──
     const img = new Image();
     img.onload = () => {
       const status = document.getElementById('ai-status');
 
-      // Max 1100px keeps the saved image small enough for localStorage
+      // 1100px keeps the saved image small enough for localStorage (~300-500 KB)
       const MAX = 1100;
       let w = img.width, h = img.height;
       if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
@@ -980,12 +1069,17 @@ function processImageFile(file, m){
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       const compressed = canvas.toDataURL('image/jpeg', 0.82);
 
-      // Save preview to localStorage
+      // Always save the preview
       try { localStorage.setItem('img_' + m, compressed); } catch(e) {}
 
-      if(status) status.innerHTML = `✅ Foto opgeslagen als referentie voor ${m}.<br>
-        Vul het rooster in door op de badges in de tabel te klikken (klik om te wisselen).`;
-      setTimeout(() => render(), 1200);
+      const b64 = compressed.split(',')[1];
+      if(getProxyUrl()){
+        extractRoosterWithProxy(b64, m);
+      } else {
+        if(status) status.innerHTML = `✅ Foto opgeslagen als referentie voor ${m}.<br>
+          <span style="color:var(--ts)">Stel een proxy URL in om shifts automatisch in te lezen.</span>`;
+        setTimeout(()=>render(), 1200);
+      }
     };
     img.onerror = () => {
       const status = document.getElementById('ai-status');
@@ -1016,13 +1110,31 @@ function buildUpload(m){
     wrap.appendChild(iw);
   }
 
+  // Proxy URL setup — show a one-time settings strip if not yet configured
+  const proxyConfigured = !!getProxyUrl();
+  if(!proxyConfigured){
+    const cfg = document.createElement('div');
+    cfg.style.cssText='background:var(--card);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:12px';
+    cfg.innerHTML=`
+      <div style="font-weight:700;color:var(--acl);margin-bottom:8px">⚙️ AI-scan proxy instellen</div>
+      <div style="color:var(--ts);margin-bottom:8px">Voer je Cloudflare Worker URL in (zie <code>proxy/worker.js</code>):</div>
+      <div style="display:flex;gap:6px">
+        <input id="proxy-url-inp" type="url" placeholder="https://rooster-proxy.xxx.workers.dev"
+          style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;
+                 padding:6px 10px;color:var(--tp);font-size:12px;outline:none">
+        <button onclick="saveProxyUrl(document.getElementById('proxy-url-inp').value)"
+          style="padding:6px 14px;background:var(--accent);color:#fff;border:none;border-radius:6px;
+                 font-weight:700;cursor:pointer;font-size:12px">Opslaan</button>
+      </div>`;
+    wrap.appendChild(cfg);
+  }
+
   // Upload zone (always visible)
-  const hasData = store[m] && store[m].some(r => r.jpa || r.gma2);
   const zone = document.createElement('div'); zone.className='upload-zone';
   zone.innerHTML = `
     <div style="font-size:26px;margin-bottom:6px">${saved ? '🔄' : '📸'}</div>
     <p style="font-weight:700;color:var(--acl)">${saved ? 'Andere foto kiezen' : 'Upload Rooster Foto'}</p>
-    <span style="color:var(--ts)">Bewaar als referentie — klik of sleep, vul daarna de tabel in</span>`;
+    <span style="color:var(--ts)">${proxyConfigured ? '🤖 AI leest automatisch alle shifts — klik of sleep' : 'Stel proxy in ↑ voor automatisch inlezen — of sleep foto als referentie'}</span>`;
 
   const inp = document.createElement('input');
   inp.type = 'file'; inp.accept = 'image/*';
