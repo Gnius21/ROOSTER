@@ -208,8 +208,8 @@ check("hrs('R=KW') === 4 (was 0 before fix)", ctx.hrs('R=KW') === 4, `got ${ctx.
 check("badgeClass('X=D') === 'b-d'", ctx.badgeClass('X=D') === 'b-d', ctx.badgeClass('X=D'));
 check("badgeClass('R=KW') === 'b-kw'", ctx.badgeClass('R=KW') === 'b-kw', ctx.badgeClass('R=KW'));
 check("escapeHtml neutralises HTML", ctx.escapeHtml('<img src=x onerror="x">') === '&lt;img src=x onerror=&quot;x&quot;&gt;', ctx.escapeHtml('<img src=x onerror="x">'));
-check("AI extraction targets a current model (claude-opus-4-8)", pageScript.includes("claude-opus-4-8") && !pageScript.includes("claude-opus-4-5"));
-check("AI extraction sends an x-api-key header", pageScript.includes("'x-api-key'"));
+check("photo upload no longer requires an API key (no anthropic key prompt)", !pageScript.includes("anthropic_api_key") && !pageScript.includes("api.anthropic.com"));
+check("photo upload is saved as a reference image", pageScript.includes("img_' + m") || pageScript.includes("localStorage.setItem('img_'"));
 
 // calcTotals consistency: total hours must equal the manual per-row sum
 const t = ctx.calcTotals('February');
