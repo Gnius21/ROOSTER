@@ -983,26 +983,35 @@ Return ALL rows for every day shown.`;
   try {
     setStatus('🤖 Verbinding maken met AI...');
 
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-8',
-        max_tokens: 3000,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
-            { type: 'text', text: prompt }
-          ]
-        }]
-      })
-    });
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+    let resp;
+    try {
+      resp = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-8',
+          max_tokens: 3000,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+              { type: 'text', text: prompt }
+            ]
+          }]
+        })
+      });
+    } finally {
+      clearTimeout(timer);
+    }
 
     if(!resp.ok) {
       if(resp.status === 401){
@@ -1042,8 +1051,31 @@ Return ALL rows for every day shown.`;
 
   } catch(err) {
     console.error('AI extract error:', err);
-    setStatus(`⚠️ Fout: ${err.message}. Probeer een scherpere foto of probeer opnieuw.`);
+    let msg;
+    if(err.name === 'AbortError'){
+      msg = 'Verzoek duurde te lang (timeout). Controleer je internetverbinding en probeer opnieuw.';
+    } else if(err.message === 'Load failed' || err.message === 'Failed to fetch' || err.name === 'TypeError'){
+      msg = 'Netwerkfout – kon de AI-server niet bereiken. Controleer je verbinding en probeer opnieuw.';
+    } else {
+      msg = err.message;
+    }
+    window.__lastB64 = b64;
+    window.__lastMonth = m;
+    if(status) status.innerHTML = `⚠️ Fout: ${msg}<br><br>
+      <button onclick="retryAiScan()" style="padding:6px 18px;background:var(--accent);color:#fff;
+        border:none;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px">
+        🔄 Opnieuw proberen
+      </button>`;
   }
+}
+
+function retryAiScan(){
+  const b64 = window.__lastB64;
+  const m   = window.__lastMonth;
+  if(!b64 || !m){ toast('Geen foto om opnieuw te proberen.'); return; }
+  const status = document.getElementById('ai-status');
+  if(status) status.textContent = '⏳ Opnieuw proberen...';
+  extractRoosterWithAI(b64, m);
 }
 
 function processImageFile(file, m){
@@ -1074,15 +1106,15 @@ function processImageFile(file, m){
       const status = document.getElementById('ai-status');
       if(status) status.textContent = '⏳ Comprimeren voor AI...';
 
-      // Max 1600px wide — higher res = better OCR accuracy
-      const MAX = 1600;
+      // Max 1100px — sufficient for OCR, keeps payload under ~400KB
+      const MAX = 1100;
       let w = img.width, h = img.height;
       if(w > MAX){ h = Math.round(h * MAX / w); w = MAX; }
 
       const canvas = document.createElement('canvas');
       canvas.width = w; canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-      const compressed = canvas.toDataURL('image/jpeg', 0.90); // high quality for OCR
+      const compressed = canvas.toDataURL('image/jpeg', 0.82); // 0.82 is plenty for OCR, keeps size manageable
 
       // Save preview to localStorage
       try { localStorage.setItem('img_' + m, compressed); } catch(e) {}
