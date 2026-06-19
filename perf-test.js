@@ -121,6 +121,7 @@ const sandbox = {
   confirm: () => false,
   prompt: () => null,
   alert: () => {},
+  navigator: { serviceWorker: { register: () => Promise.resolve() } },
   fetch: () => Promise.reject(new Error('no network in test')),
   console,
 };
@@ -158,8 +159,10 @@ const exportShim = `
   MONTHS, MDAYS, PRESET, MONTHS2025, DATA2025,
   emptyMonth, hrs, escapeHtml, badgeClass, calcTotals, calc2025Yearly,
   renderTableOnly, render, render2025, exportXlsx, export2025,
+  undoPush, undoEdit,
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
+  getUndoStack: () => undoStack,
 };`;
 
 const tInit = process.hrtime.bigint();
@@ -212,6 +215,16 @@ check("AI extraction sends an x-api-key header", pageScript.includes("'x-api-key
 const t = ctx.calcTotals('February');
 const manual = ctx.PRESET.February.reduce((s, r) => s + ctx.hrs(r.jpa), 0);
 check('calcTotals(February).jpa matches manual per-row sum', t.jpa === manual, `${t.jpa} vs ${manual}`);
+
+// undoEdit: push an entry, restore it, verify stack is empty
+{
+  const row = { jpa: 'D', gma2: 'X' };
+  ctx.undoPush({ m: 'January', row, field: 'jpa', old: 'X' });
+  check('undoPush adds to undoStack', ctx.getUndoStack().length === 1);
+  ctx.undoEdit();
+  check('undoEdit restores old value', row.jpa === 'X', `got '${row.jpa}'`);
+  check('undoEdit empties the stack', ctx.getUndoStack().length === 0);
+}
 
 console.log('\n=== Benchmarks ===');
 const avgTotals = bench('calcTotals (all 12 months)', () => { ctx.MONTHS.forEach(m => ctx.calcTotals(m)); }, 500);

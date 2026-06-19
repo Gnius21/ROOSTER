@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Rooster Observatoren 2026</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#e8692a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Rooster">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
@@ -325,6 +331,7 @@ tbody tr.today td.dt-num-wrap .dt-num {
   <div class="actions">
     <button class="btn btn-orange" onclick="exportXlsx()">📥 Export Excel</button>
     <button class="btn btn-ghost"  onclick="clearMonth()">🗑️ Wis maand</button>
+    <button class="btn btn-ghost" id="undoBtn" onclick="undoEdit()" disabled>↩ Ongedaan</button>
   </div>
 </div>
 
@@ -542,6 +549,40 @@ const PRESET = {
     {date:28,day:'ZO',jpa:'D',   gma2:'X',  op:''},
     {date:29,day:'MA',jpa:'A',   gma2:'D',  op:''},
     {date:30,day:'DI',jpa:'A',   gma2:'KW', op:''},
+  ],
+
+  July:[
+    {date:1, day:'WO',jpa:'X',   gma2:'D',  op:''},
+    {date:2, day:'DO',jpa:'R=A', gma2:'KW', op:'Dia di Bandera'},
+    {date:3, day:'VR',jpa:'R',   gma2:'D',  op:''},
+    {date:4, day:'ZA',jpa:'X',   gma2:'X',  op:''},
+    {date:5, day:'ZO',jpa:'D',   gma2:'X',  op:''},
+    {date:6, day:'MA',jpa:'D*',  gma2:'KW', op:''},
+    {date:7, day:'DI',jpa:'A',   gma2:'D',  op:''},
+    {date:8, day:'WO',jpa:'A',   gma2:'KW', op:''},
+    {date:9, day:'DO',jpa:'X',   gma2:'D',  op:''},
+    {date:10,day:'VR',jpa:'R=A', gma2:'KW', op:''},
+    {date:11,day:'ZA',jpa:'R',   gma2:'X',  op:''},
+    {date:12,day:'ZO',jpa:'X',   gma2:'X',  op:''},
+    {date:13,day:'MA',jpa:'D*',  gma2:'A',  op:''},
+    {date:14,day:'DI',jpa:'D*',  gma2:'KW', op:''},
+    {date:15,day:'WO',jpa:'A',   gma2:'KW', op:''},
+    {date:16,day:'DO',jpa:'A',   gma2:'KW', op:''},
+    {date:17,day:'VR',jpa:'X',   gma2:'D',  op:''},
+    {date:18,day:'ZA',jpa:'VAK', gma2:'X',  op:''},
+    {date:19,day:'ZO',jpa:'VAK', gma2:'X',  op:''},
+    {date:20,day:'MA',jpa:'VAK', gma2:'KW', op:''},
+    {date:21,day:'DI',jpa:'VAK', gma2:'KW', op:''},
+    {date:22,day:'WO',jpa:'VAK', gma2:'KW', op:''},
+    {date:23,day:'DO',jpa:'X',   gma2:'KW', op:''},
+    {date:24,day:'VR',jpa:'X',   gma2:'KW', op:''},
+    {date:25,day:'ZA',jpa:'VAK', gma2:'X',  op:''},
+    {date:26,day:'ZO',jpa:'VAK', gma2:'X',  op:''},
+    {date:27,day:'MA',jpa:'VAK', gma2:'D',  op:''},
+    {date:28,day:'DI',jpa:'X',   gma2:'D',  op:''},
+    {date:29,day:'WO',jpa:'D',   gma2:'X',  op:''},
+    {date:30,day:'DO',jpa:'D*',  gma2:'KW', op:''},
+    {date:31,day:'VR',jpa:'A',   gma2:'KW', op:''},
   ]
 };
 
@@ -748,6 +789,24 @@ function save(m){
   try{ localStorage.setItem('r26_'+m, JSON.stringify(store[m])); }catch(e){ toast('⚠️ Opslaan mislukt'); }
 }
 
+function undoPush(entry){
+  undoStack.push(entry);
+  const btn = document.getElementById('undoBtn');
+  if(btn) btn.disabled = false;
+}
+
+function undoEdit(){
+  if(!undoStack.length){ toast('Niets om ongedaan te maken'); return; }
+  const {m, row, field, old} = undoStack.pop();
+  row[field] = old;
+  save(m);
+  if(current === m) renderTableOnly();
+  refreshCards();
+  const btn = document.getElementById('undoBtn');
+  if(btn) btn.disabled = undoStack.length === 0;
+  toast('↩ Wijziging teruggedraaid');
+}
+
 function emptyMonth(idx){
   return Array.from({length:MDAYS[idx]},(_,i)=>({
     date:i+1, day:DNAMES[(new Date(2026, idx, i+1).getDay()+6)%7], jpa:'', gma2:'', op:''
@@ -842,6 +901,7 @@ function calcTotals(m){
 let current = 'May';
 let filter  = 'all'; // all | jpa | gma
 let mode    = '2026'; // '2026' | '2025'
+const undoStack = [];
 
 // ══════════════════════════════════════════
 //  TABS
@@ -1405,6 +1465,7 @@ function render(){
       <div class="actions">
         <button class="btn btn-orange" onclick="exportXlsx()">📥 Export Excel</button>
         <button class="btn btn-ghost"  onclick="clearMonth()">🗑️ Wis maand</button>
+        <button class="btn btn-ghost" id="undoBtn" onclick="undoEdit()" ${undoStack.length ? '' : 'disabled'}>↩ Ongedaan</button>
       </div>`;
   }
 
@@ -1468,14 +1529,14 @@ function renderTableOnly(){
     // JPA
     if(showJpa){
       const td=document.createElement('td'); td.className='shift-col';
-      td.appendChild(makeBadge(row.jpa, true, v=>{ row.jpa=v; save(m); refreshCards(); }));
+      td.appendChild(makeBadge(row.jpa, true, v=>{ const old=row.jpa; row.jpa=v; undoPush({m,row,field:'jpa',old}); save(m); refreshCards(); }));
       tr.appendChild(td);
     }
 
     // GMA2
     if(showGma){
       const td=document.createElement('td'); td.className='shift-col';
-      td.appendChild(makeBadge(row.gma2, true, v=>{ row.gma2=v; save(m); refreshCards(); }));
+      td.appendChild(makeBadge(row.gma2, true, v=>{ const old=row.gma2; row.gma2=v; undoPush({m,row,field:'gma2',old}); save(m); refreshCards(); }));
       tr.appendChild(td);
     }
 
@@ -1608,6 +1669,10 @@ setTimeout(()=>{
   const row = document.getElementById('today-row');
   if(row) row.scrollIntoView({behavior:'smooth', block:'center'});
 }, 150);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
