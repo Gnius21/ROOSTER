@@ -8,11 +8,11 @@ A single-file, offline-capable web app for the observatory shift schedule
 ## Features
 
 - Interactive 2026 month planner — click any shift badge to cycle the code
-  (`X`, `D`, `D*`, `A`, `KW`, `R`, `R=A`, `R=D`, `VAK`, …). Edits save
-  automatically to your browser (`localStorage`).
+  (`X`, `D`, `D*`, `A`, `KW`, `R`, `R=A`, `R=D`, `VAK`, `Z` (ziek), …). Edits
+  save automatically to your browser (`localStorage`).
 - **Undo** (`↩ Ongedaan`) reverts the last badge edit.
-- **July** shows every observer column (GMA, JPA, QPI, AYS, FCA); a toggle
-  switches between all persons and only GMA + JPA.
+- **June & July** show every observer column (GMA, JPA, QPI, AYS, FCA); a
+  toggle switches between all persons and only GMA + JPA.
 - **Photo upload** with on-device OCR (Tesseract.js) — reads a schedule photo
   entirely in the browser, no API key or server required. Results are
   best-effort and fully editable.
@@ -33,8 +33,8 @@ python3 -m http.server 8080
 ### Tests
 
 `perf-test.js` runs the page's inline script in a Node DOM stub and checks
-data integrity, bug-fix regressions, the July layout/toggle, OCR helpers,
-and performance thresholds.
+data integrity, bug-fix regressions, the June/July multi-column layout and
+toggle, the stale-cache migration, OCR helpers, and performance thresholds.
 
 ```sh
 node perf-test.js
