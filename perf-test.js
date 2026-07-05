@@ -160,7 +160,7 @@ const exportShim = `
   emptyMonth, hrs, escapeHtml, badgeClass, calcTotals, calc2025Yearly,
   renderTableOnly, render, render2025, exportXlsx, export2025,
   undoPush, undoEdit, normShift, personsFor,
-  setJulyView: v => { julyView = v; },
+  setMultiView: (m,v) => { multiView[m] = v; },
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
   getUndoStack: () => undoStack,
@@ -217,20 +217,27 @@ check("normShift maps clean codes (case-insensitive)", ctx.normShift('d*') === '
 check("normShift fuzzy-corrects a 1-char OCR error (VAX→VAK)", ctx.normShift('VAX') === 'VAK', ctx.normShift('VAX'));
 check("normShift returns '' for empty input", ctx.normShift('') === '');
 
-// July shows all five person columns, GMA & JPA bold, in the required order
-const julyCols = ctx.personsFor('July');
-check("July renders 5 person columns", julyCols.length === 5, `got ${julyCols.length}`);
-check("July column order is GMA, JPA, QPI, AYS, FCA", julyCols.map(p=>p.label).join(',') === 'GMA,JPA,QPI,AYS,FCA', julyCols.map(p=>p.label).join(','));
-check("July: GMA & JPA are bold, others not", julyCols[0].bold && julyCols[1].bold && !julyCols[2].bold && !julyCols[3].bold && !julyCols[4].bold);
-check("July preset rows carry qpi/ays/fca", ctx.PRESET.July.every(r => 'qpi' in r && 'ays' in r && 'fca' in r));
+// June & July both show all five person columns, GMA & JPA bold, in the required order
+for (const monthName of ['June', 'July']) {
+  const cols = ctx.personsFor(monthName);
+  check(`${monthName} renders 5 person columns`, cols.length === 5, `got ${cols.length}`);
+  check(`${monthName} column order is GMA, JPA, QPI, AYS, FCA`, cols.map(p=>p.label).join(',') === 'GMA,JPA,QPI,AYS,FCA', cols.map(p=>p.label).join(','));
+  check(`${monthName}: GMA & JPA are bold, others not`, cols[0].bold && cols[1].bold && !cols[2].bold && !cols[3].bold && !cols[4].bold);
+  check(`${monthName} preset rows carry qpi/ays/fca`, ctx.PRESET[monthName].every(r => 'qpi' in r && 'ays' in r && 'fca' in r));
+
+  // toggle: 'gmajpa' view shows only GMA + JPA (both bold, GMA first)
+  ctx.setMultiView(monthName, 'gmajpa');
+  const two = ctx.personsFor(monthName);
+  check(`${monthName} 'GMA+JPA only' view shows exactly GMA then JPA`, two.map(p=>p.label).join(',') === 'GMA,JPA', two.map(p=>p.label).join(','));
+  check(`${monthName} 'GMA+JPA only' keeps both bold`, two.every(p=>p.bold));
+  ctx.setMultiView(monthName, 'all');
+  check(`${monthName} toggling back to 'all' restores 5 columns`, ctx.personsFor(monthName).length === 5);
+}
 check("other months still show default 2 columns (filter=all)", (ctx.setCurrent('May'), ctx.personsFor('May').length) === 2);
-// July toggle: 'gmajpa' view shows only GMA + JPA (both bold, GMA first)
-ctx.setJulyView('gmajpa');
-const julyTwo = ctx.personsFor('July');
-check("July 'GMA+JPA only' view shows exactly GMA then JPA", julyTwo.map(p=>p.label).join(',') === 'GMA,JPA', julyTwo.map(p=>p.label).join(','));
-check("July 'GMA+JPA only' keeps both bold", julyTwo.every(p=>p.bold));
-ctx.setJulyView('all');
-check("July toggling back to 'all' restores 5 columns", ctx.personsFor('July').length === 5);
+// June's jpa/gma2 values must be unchanged by the qpi/ays/fca addition
+const juneManualJpa = ctx.PRESET.June.reduce((s, r) => s + ctx.hrs(r.jpa), 0);
+const juneTotals = ctx.calcTotals('June');
+check("June calcTotals.jpa matches manual per-row sum (jpa/gma2 untouched)", juneTotals.jpa === juneManualJpa, `${juneTotals.jpa} vs ${juneManualJpa}`);
 
 // calcTotals consistency: total hours must equal the manual per-row sum
 const t = ctx.calcTotals('February');
