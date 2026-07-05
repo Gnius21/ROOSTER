@@ -785,6 +785,11 @@ MONTHS.forEach((m,i)=>{
   // Try localStorage first (preserves user edits), fall back to preset, then empty
   let d=null;
   try{ const s=localStorage.getItem('r26_'+m); if(s) d=JSON.parse(s); }catch(e){}
+  // June/July gained qpi/ays/fca columns after their initial release. A cache
+  // saved before that migration only has jpa/gma2 and would silently shadow
+  // the current (corrected) preset forever — discard it so the fresh 5-column
+  // data loads instead.
+  if(d && d.length && (m==='June'||m==='July') && !('qpi' in d[0])) d=null;
   store[m] = d || (PRESET[m] ? PRESET[m].map(r=>({...r})) : emptyMonth(i));
 });
 
