@@ -903,6 +903,9 @@ let current = 'May';
 let filter  = 'all'; // all | jpa | gma
 let mode    = '2026'; // '2026' | '2025'
 const undoStack = [];
+// July can show all persons or only GMA + JPA
+let julyView = 'all'; // 'all' | 'gmajpa'
+try{ julyView = localStorage.getItem('july_view') || 'all'; }catch(e){}
 
 // ══════════════════════════════════════════
 //  TABS
@@ -1540,15 +1543,16 @@ function render(){
 }
 
 function personsFor(m){
-  // July shows every person column: GMA & JPA in bold, the rest normal.
+  // July: GMA & JPA (bold) always; the other persons only in 'all' view.
   if(m==='July'){
-    return [
+    const all=[
       {key:'gma2', label:'GMA', bold:true},
       {key:'jpa',  label:'JPA', bold:true},
       {key:'qpi',  label:'QPI', bold:false},
       {key:'ays',  label:'AYS', bold:false},
       {key:'fca',  label:'FCA', bold:false},
     ];
+    return julyView==='gmajpa' ? all.slice(0,2) : all;
   }
   // Other months: the two default persons, controlled by the filter.
   const list=[];
@@ -1557,9 +1561,41 @@ function personsFor(m){
   return list;
 }
 
+function toggleJulyView(){
+  julyView = (julyView==='all') ? 'gmajpa' : 'all';
+  try{ localStorage.setItem('july_view', julyView); }catch(e){}
+  renderTableOnly();
+}
+
+// In July, swap the person-filter buttons for an "all vs GMA+JPA" toggle.
+function ensureJulyToggle(m){
+  const fr=document.querySelector('.filter-row');
+  if(!fr) return;
+  const isJuly = (m==='July');
+  ['f-all','f-jpa','f-gma'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display = isJuly ? 'none' : '';
+  });
+  let btn=document.getElementById('f-julytoggle');
+  if(isJuly){
+    if(!btn){
+      btn=document.createElement('button');
+      btn.id='f-julytoggle';
+      btn.onclick=toggleJulyView;
+      fr.appendChild(btn);
+    }
+    btn.style.display='';
+    btn.textContent = julyView==='all' ? '👥 Alle personen' : '👤 Alleen GMA + JPA';
+    btn.className='filter-btn '+(julyView==='all' ? 'on-all' : 'on-gma');
+  } else if(btn){
+    btn.style.display='none';
+  }
+}
+
 function renderTableOnly(){
   const m=current;
   const data=store[m];
+  ensureJulyToggle(m);
   const persons=personsFor(m);
 
   // thead

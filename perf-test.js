@@ -160,6 +160,7 @@ const exportShim = `
   emptyMonth, hrs, escapeHtml, badgeClass, calcTotals, calc2025Yearly,
   renderTableOnly, render, render2025, exportXlsx, export2025,
   undoPush, undoEdit, normShift, personsFor,
+  setJulyView: v => { julyView = v; },
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
   getUndoStack: () => undoStack,
@@ -223,6 +224,13 @@ check("July column order is GMA, JPA, QPI, AYS, FCA", julyCols.map(p=>p.label).j
 check("July: GMA & JPA are bold, others not", julyCols[0].bold && julyCols[1].bold && !julyCols[2].bold && !julyCols[3].bold && !julyCols[4].bold);
 check("July preset rows carry qpi/ays/fca", ctx.PRESET.July.every(r => 'qpi' in r && 'ays' in r && 'fca' in r));
 check("other months still show default 2 columns (filter=all)", (ctx.setCurrent('May'), ctx.personsFor('May').length) === 2);
+// July toggle: 'gmajpa' view shows only GMA + JPA (both bold, GMA first)
+ctx.setJulyView('gmajpa');
+const julyTwo = ctx.personsFor('July');
+check("July 'GMA+JPA only' view shows exactly GMA then JPA", julyTwo.map(p=>p.label).join(',') === 'GMA,JPA', julyTwo.map(p=>p.label).join(','));
+check("July 'GMA+JPA only' keeps both bold", julyTwo.every(p=>p.bold));
+ctx.setJulyView('all');
+check("July toggling back to 'all' restores 5 columns", ctx.personsFor('July').length === 5);
 
 // calcTotals consistency: total hours must equal the manual per-row sum
 const t = ctx.calcTotals('February');
