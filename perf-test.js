@@ -175,7 +175,7 @@ check('init completes in < 2000 ms', initMs < 2000, `${initMs.toFixed(1)} ms`);
 const ctx = sandbox.__t;
 
 console.log('\n=== Data integrity: 2026 preset ===');
-const KNOWN_CODES = new Set(['', 'X', 'D', 'D*', 'A', 'KW', 'R', 'R=A', 'R=D', 'R=KW', 'VAK', 'VG', 'X/D', 'X=D']);
+const KNOWN_CODES = new Set(['', 'X', 'D', 'D*', 'A', 'KW', 'R', 'R=A', 'R=D', 'R=D*', 'R=KW', 'VAK', 'VG', 'X/D', 'X=D', 'Z']);
 const DNAMES = ['MA','DI','WO','DO','VR','ZA','ZO'];
 let badDays = [], badCodes = [], badCounts = [];
 ctx.MONTHS.forEach((m, idx) => {
@@ -187,7 +187,8 @@ ctx.MONTHS.forEach((m, idx) => {
     if (r.date !== i + 1) badCounts.push(`${m} row ${i}: date ${r.date}`);
     const realDay = DNAMES[(new Date(2026, idx, r.date).getDay() + 6) % 7];
     if (r.day !== realDay) badDays.push(`${m} ${r.date}: '${r.day}' should be '${realDay}'`);
-    for (const code of [r.jpa, r.gma2]) {
+    for (const code of [r.jpa, r.gma2, r.qpi, r.ays, r.fca]) {
+      if (code === undefined) continue; // qpi/ays/fca only exist on multi-person months
       if (!KNOWN_CODES.has((code || '').toUpperCase().trim())) badCodes.push(`${m} ${r.date}: '${code}'`);
     }
   });
@@ -208,6 +209,8 @@ check("hrs('X=D') === 12 (was 0 before fix)", ctx.hrs('X=D') === 12, `got ${ctx.
 check("hrs('R=KW') === 4 (was 0 before fix)", ctx.hrs('R=KW') === 4, `got ${ctx.hrs('R=KW')}`);
 check("badgeClass('X=D') === 'b-d'", ctx.badgeClass('X=D') === 'b-d', ctx.badgeClass('X=D'));
 check("badgeClass('R=KW') === 'b-kw'", ctx.badgeClass('R=KW') === 'b-kw', ctx.badgeClass('R=KW'));
+check("hrs('Z') === 0 (sick day, unworked)", ctx.hrs('Z') === 0, `got ${ctx.hrs('Z')}`);
+check("badgeClass('Z') === 'b-z'", ctx.badgeClass('Z') === 'b-z', ctx.badgeClass('Z'));
 check("escapeHtml neutralises HTML", ctx.escapeHtml('<img src=x onerror="x">') === '&lt;img src=x onerror=&quot;x&quot;&gt;', ctx.escapeHtml('<img src=x onerror="x">'));
 check("scan runs fully client-side (no API key, no server endpoint)", !pageScript.includes("anthropic_api_key") && !pageScript.includes("api.anthropic.com") && !pageScript.includes("PROXY_URL"));
 check("scan uses local Tesseract OCR", pageScript.includes("Tesseract") && pageScript.includes("scanRoosterOCR"));
