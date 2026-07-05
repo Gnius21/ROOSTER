@@ -210,6 +210,7 @@ td[contenteditable=true]:focus { outline: 2px solid var(--accent); outline-offse
 .b-ra  { background: rgba(34,197,94,0.2);   color: #4ade80; border: 1px solid rgba(34,197,94,0.3); }
 .b-rd  { background: rgba(20,184,166,0.2);  color: #2dd4bf; border: 1px solid rgba(20,184,166,0.3); }
 .b-vak { background: rgba(239,68,68,0.2);   color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+.b-z   { background: rgba(244,63,94,0.18);  color: #fb7185; border: 1px solid rgba(244,63,94,0.3); }
 .b-empty { background: transparent; color: var(--ts); border: 1px solid transparent; }
 
 /* ── LEGEND ── */
@@ -319,6 +320,7 @@ tbody tr.today td.dt-num-wrap .dt-num {
       <div class="leg"><span class="badge b-kw" style="min-width:auto;padding:3px 8px">KW</span> Kantoorwerk – 4u</div>
       <div class="leg"><span class="badge b-rd" style="min-width:auto;padding:3px 8px">R=D</span> Reserve→Dag – 12u</div>
       <div class="leg"><span class="badge b-ra" style="min-width:auto;padding:3px 8px">R=A</span> Reserve→Avond – 12u</div>
+      <div class="leg"><span class="badge b-z" style="min-width:auto;padding:3px 8px">Z</span> Ziek</div>
     </div>
   </div>
 
@@ -523,21 +525,21 @@ const PRESET = {
     {date:1, day:'MA',qpi:'X',   jpa:'R',   ays:'A',   fca:'X',   gma2:'D',   op:''},
     {date:2, day:'DI',qpi:'R',   jpa:'X',   ays:'A',   fca:'D*',  gma2:'KW',  op:''},
     {date:3, day:'WO',qpi:'R',   jpa:'D*',  ays:'X',   fca:'A',   gma2:'KW',  op:''},
-    {date:4, day:'DO',qpi:'X',   jpa:'D*',  ays:'R',   fca:'A',   gma2:'KW',  op:''},
-    {date:5, day:'VR',qpi:'D*',  jpa:'A',   ays:'X',   fca:'X',   gma2:'KW',  op:''},
+    {date:4, day:'DO',qpi:'X',   jpa:'KW',  ays:'R',   fca:'A',   gma2:'Z',   op:''},
+    {date:5, day:'VR',qpi:'D*',  jpa:'A',   ays:'KW',  fca:'X',   gma2:'Z',   op:''},
     {date:6, day:'ZA',qpi:'D',   jpa:'A',   ays:'X',   fca:'R',   gma2:'X',   op:''},
     {date:7, day:'ZO',qpi:'A',   jpa:'X',   ays:'D',   fca:'R',   gma2:'X',   op:'X'},
-    {date:8, day:'MA',qpi:'A',   jpa:'R',   ays:'D*',  fca:'X',   gma2:'KW',  op:''},
-    {date:9, day:'DI',qpi:'X',   jpa:'R',   ays:'A',   fca:'X',   gma2:'D',   op:''},
-    {date:10,day:'WO',qpi:'R',   jpa:'X',   ays:'A',   fca:'D*',  gma2:'KW',  op:''},
-    {date:11,day:'DO',qpi:'R',   jpa:'X',   ays:'X',   fca:'A',   gma2:'D',   op:''},
-    {date:12,day:'VR',qpi:'X',   jpa:'D*',  ays:'R',   fca:'A',   gma2:'KW',  op:''},
+    {date:8, day:'MA',qpi:'A',   jpa:'R',   ays:'KW',  fca:'X',   gma2:'Z',   op:''},
+    {date:9, day:'DI',qpi:'X',   jpa:'D',   ays:'A',   fca:'X',   gma2:'Z',   op:''},
+    {date:10,day:'WO',qpi:'R',   jpa:'X',   ays:'A',   fca:'KW',  gma2:'Z',   op:''},
+    {date:11,day:'DO',qpi:'D',   jpa:'X',   ays:'X',   fca:'A',   gma2:'Z',   op:''},
+    {date:12,day:'VR',qpi:'X',   jpa:'D*',  ays:'KW',  fca:'A',   gma2:'Z',   op:''},
     {date:13,day:'ZA',qpi:'D',   jpa:'A',   ays:'R',   fca:'X',   gma2:'X',   op:''},
     {date:14,day:'ZO',qpi:'D',   jpa:'A',   ays:'X',   fca:'R',   gma2:'X',   op:''},
     {date:15,day:'MA',qpi:'A',   jpa:'X',   ays:'D*',  fca:'R',   gma2:'KW',  op:''},
     {date:16,day:'DI',qpi:'A',   jpa:'R',   ays:'D*',  fca:'X',   gma2:'KW',  op:''},
-    {date:17,day:'WO',qpi:'X',   jpa:'R',   ays:'X',   fca:'X',   gma2:'D',   op:''},
-    {date:18,day:'DO',qpi:'R',   jpa:'X',   ays:'X',   fca:'D*',  gma2:'KW',  op:''},
+    {date:17,day:'WO',qpi:'X',   jpa:'A',   ays:'X',   fca:'X',   gma2:'D',   op:''},
+    {date:18,day:'DO',qpi:'A',   jpa:'X',   ays:'X',   fca:'D*',  gma2:'KW',  op:''},
     {date:19,day:'VR',qpi:'R',   jpa:'D*',  ays:'X',   fca:'A',   gma2:'KW',  op:''},
     {date:20,day:'ZA',qpi:'X',   jpa:'D',   ays:'R',   fca:'A',   gma2:'X',   op:''},
     {date:21,day:'ZO',qpi:'D',   jpa:'A',   ays:'R',   fca:'X',   gma2:'X',   op:''},
@@ -549,7 +551,7 @@ const PRESET = {
     {date:27,day:'ZA',qpi:'R',   jpa:'X',   ays:'X',   fca:'A',   gma2:'D',   op:''},
     {date:28,day:'ZO',qpi:'X',   jpa:'D',   ays:'R',   fca:'A',   gma2:'X',   op:''},
     {date:29,day:'MA',qpi:'X',   jpa:'A',   ays:'R',   fca:'X',   gma2:'D',   op:''},
-    {date:30,day:'DI',qpi:'D*',  jpa:'A',   ays:'X',   fca:'R',   gma2:'KW',  op:''},
+    {date:30,day:'DI',qpi:'D*',  jpa:'A',   ays:'X',   fca:'D*',  gma2:'KW',  op:''},
   ],
 
   July:[
@@ -838,6 +840,7 @@ function badgeClass(v){
   if(!v||v==='') return 'b-empty';
   const s=v.toUpperCase().trim();
   if(s==='VAK')        return 'b-vak';
+  if(s==='Z')          return 'b-z';
   if(s==='KW')         return 'b-kw';
   if(s.startsWith('R=A')) return 'b-ra';
   if(s.startsWith('R=D')) return 'b-rd';
@@ -865,7 +868,7 @@ function makeBadge(val, editable, onChange){
     el.title = 'Klik om te bewerken';
     el.onclick = ()=>{
       const cur = el.dataset.val || val;
-      const opts = ['X','D','D*','A','KW','R','R=A','R=D','VAK',''];
+      const opts = ['X','D','D*','A','KW','R','R=A','R=D','VAK','Z',''];
       const idx  = opts.indexOf(cur.toUpperCase());
       const next = opts[(idx+1)%opts.length];
       el.dataset.val = next;
@@ -951,7 +954,7 @@ function setFilter(f){
 //  PHOTO UPLOAD + LOCAL OCR SCAN (no API, no server)
 //  Uses Tesseract.js entirely in the browser.
 // ══════════════════════════════════════════
-const KNOWN_SHIFTS = ['X','D','D*','A','KW','R','R=A','R=D','R=KW','VAK','VG'];
+const KNOWN_SHIFTS = ['X','D','D*','A','KW','R','R=A','R=D','R=KW','VAK','VG','Z'];
 
 function levenshtein(a, b){
   const m=a.length, n=b.length;
@@ -1516,6 +1519,7 @@ function render(){
           <div class="leg"><span class="badge b-kw" style="min-width:auto;padding:3px 8px">KW</span> Kantoorwerk – 4u</div>
           <div class="leg"><span class="badge b-rd" style="min-width:auto;padding:3px 8px">R=D</span> Reserve→Dag – 12u</div>
           <div class="leg"><span class="badge b-ra" style="min-width:auto;padding:3px 8px">R=A</span> Reserve→Avond – 12u</div>
+      <div class="leg"><span class="badge b-z" style="min-width:auto;padding:3px 8px">Z</span> Ziek</div>
         </div>
       </div>
       <div class="person-cards" id="personCards"></div>
