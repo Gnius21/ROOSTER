@@ -159,7 +159,7 @@ const exportShim = `
   MONTHS, MDAYS, PRESET, MONTHS2025, DATA2025,
   emptyMonth, hrs, escapeHtml, badgeClass, calcTotals, calc2025Yearly,
   renderTableOnly, render, render2025, exportXlsx, export2025,
-  undoPush, undoEdit, normShift,
+  undoPush, undoEdit, normShift, personsFor,
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
   getUndoStack: () => undoStack,
@@ -215,6 +215,14 @@ check("photo reference image saved to localStorage", pageScript.includes("localS
 check("normShift maps clean codes (case-insensitive)", ctx.normShift('d*') === 'D*' && ctx.normShift('vak') === 'VAK', `${ctx.normShift('d*')}, ${ctx.normShift('vak')}`);
 check("normShift fuzzy-corrects a 1-char OCR error (VAX→VAK)", ctx.normShift('VAX') === 'VAK', ctx.normShift('VAX'));
 check("normShift returns '' for empty input", ctx.normShift('') === '');
+
+// July shows all five person columns, GMA & JPA bold, in the required order
+const julyCols = ctx.personsFor('July');
+check("July renders 5 person columns", julyCols.length === 5, `got ${julyCols.length}`);
+check("July column order is GMA, JPA, QPI, AYS, FCA", julyCols.map(p=>p.label).join(',') === 'GMA,JPA,QPI,AYS,FCA', julyCols.map(p=>p.label).join(','));
+check("July: GMA & JPA are bold, others not", julyCols[0].bold && julyCols[1].bold && !julyCols[2].bold && !julyCols[3].bold && !julyCols[4].bold);
+check("July preset rows carry qpi/ays/fca", ctx.PRESET.July.every(r => 'qpi' in r && 'ays' in r && 'fca' in r));
+check("other months still show default 2 columns (filter=all)", (ctx.setCurrent('May'), ctx.personsFor('May').length) === 2);
 
 // calcTotals consistency: total hours must equal the manual per-row sum
 const t = ctx.calcTotals('February');
