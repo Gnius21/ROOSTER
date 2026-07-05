@@ -164,6 +164,7 @@ const exportShim = `
   setCurrent: m => { current = m; },
   setMode: m => { mode = m; },
   getUndoStack: () => undoStack,
+  getStore: () => store,
 };`;
 
 const tInit = process.hrtime.bigint();
@@ -273,6 +274,50 @@ check('render avg < 50 ms', avgRender < 50, `${avgRender.toFixed(3)} ms`);
 check('calc2025Yearly avg < 5 ms', avg2025calc < 5, `${avg2025calc.toFixed(3)} ms`);
 check('render2025 avg < 100 ms', avg2025 < 100, `${avg2025.toFixed(3)} ms`);
 check('exportXlsx avg < 25 ms', avgExport < 25, `${avgExport.toFixed(3)} ms`);
+
+console.log('\n=== Stale-cache migration (June/July schema upgrade) ===');
+{
+  // Simulate a device that cached June under the OLD 2-column schema
+  // (jpa/gma2 only, no qpi/ays/fca) before that feature existed, then
+  // verify a fresh script init discards the stale cache and loads the
+  // current 5-column preset instead of silently shadowing it forever.
+  const staleIdRegistry = new Map();
+  const staleElements = [];
+  const staleDocStub = {
+    createElement: tag => { const el = new StubElement(tag); staleElements.push(el); return el; },
+    getElementById: id => staleIdRegistry.get(id) || null,
+    querySelector: sel => staleElements.find(el => cssMatch(el, sel)) || null,
+    querySelectorAll: sel => staleElements.filter(el => cssMatch(el, sel)),
+  };
+  for (const id of ['tabs','personCards','uploadWrap','thead','tbody','hTitle','hSub','toast','f-all','f-jpa','f-gma']) {
+    const el = new StubElement('div'); el.id = id; staleElements.push(el); staleIdRegistry.set(id, el);
+  }
+  const staleFilterRow = new StubElement('div'); staleFilterRow.className = 'filter-row'; staleElements.push(staleFilterRow);
+
+  const staleStorage = new Map();
+  const staleJune = Array.from({ length: 30 }, (_, i) => ({ date: i + 1, day: 'MA', jpa: 'X', gma2: 'X', op: '' }));
+  staleStorage.set('r26_June', JSON.stringify(staleJune));
+
+  const staleSandbox = {
+    document: staleDocStub,
+    localStorage: {
+      getItem: k => (staleStorage.has(k) ? staleStorage.get(k) : null),
+      setItem: (k, v) => staleStorage.set(k, String(v)),
+      removeItem: k => staleStorage.delete(k),
+    },
+    XLSX: { utils: { book_new: () => ({}), aoa_to_sheet: r => ({ r }), book_append_sheet: () => {} }, writeFile: () => {} },
+    setTimeout: () => 0, clearTimeout: () => {}, confirm: () => false, prompt: () => null, alert: () => {},
+    navigator: { serviceWorker: { register: () => Promise.resolve() } },
+    fetch: () => Promise.reject(new Error('no network in test')),
+    console,
+  };
+  vm.createContext(staleSandbox);
+  vm.runInContext(pageScript + exportShim, staleSandbox, { filename: 'index.html#script(migration-test)' });
+
+  const migratedJune = staleSandbox.__t.getStore().June;
+  check('stale pre-migration June cache is discarded on load', 'qpi' in migratedJune[0], `keys: ${Object.keys(migratedJune[0]).join(',')}`);
+  check('migrated June day 4 carries the corrected preset values', migratedJune[3].jpa === 'KW' && migratedJune[3].gma2 === 'Z', `jpa=${migratedJune[3].jpa} gma2=${migratedJune[3].gma2}`);
+}
 
 console.log(`\n${passed} passed, ${failed} failed\n`);
 process.exit(failed === 0 ? 0 : 1);
